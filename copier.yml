@@ -8,7 +8,6 @@ _skip_if_exists:
   - copier.yml
   - template
   - tests
-  - CHANGELOG.md
   - README.md
   - AGENTS.md
   - pyproject.toml

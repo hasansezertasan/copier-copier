@@ -9,7 +9,6 @@ EXPECTED_ROOT = {
     ".gitattributes",
     ".gitignore",
     "AGENTS.md",
-    "CHANGELOG.md",
     "LICENSE",
     "cobo.lock",
     "README.md",
