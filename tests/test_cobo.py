@@ -38,6 +38,12 @@ def test_rendered_seals_are_intact(rendered):
     assert "0 fragment(s) need updating" in result.stdout
 
 
+def test_copy_tells_the_author_cobo_owns_the_boilerplate(render):
+    result, _ = render()
+    assert result.returncode == 0, result.stderr
+    assert "cobo gitignore dump" in result.stderr
+
+
 def test_cobo_is_pinned_in_mise_and_checked_weekly(rendered):
     mise = tomllib.loads((rendered / ".config" / "mise.toml").read_text())
     assert mise["tools"]["pipx:cobo"] == "0.6.0"
