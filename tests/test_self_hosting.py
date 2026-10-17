@@ -6,10 +6,11 @@ author via `_skip_if_exists`, and every author-owned file must exist.
 """
 
 import filecmp
+import re
 
 import yaml
 
-from conftest import REPO, copier, data_flags, git
+from conftest import REPO, copier, data_flags
 
 ANSWERS = yaml.safe_load((REPO / ".copier-answers.yml").read_text())
 SKIPPED = yaml.safe_load((REPO / "copier.yml").read_text())["_skip_if_exists"]
@@ -41,7 +42,8 @@ def test_author_owned_files_exist():
     assert missing == []
 
 
-def test_answers_file_is_anchored_to_the_published_template_and_a_real_commit():
+def test_answers_file_is_anchored_to_the_published_template():
     assert ANSWERS["_src_path"] == "gh:hasansezertasan/copier-copier"
-    known = git("cat-file", "-e", f"{ANSWERS['_commit']}^{{commit}}", cwd=REPO)
-    assert known.returncode == 0, f"_commit {ANSWERS['_commit']} is not in this repo's history"
+    # A tag or a commit sha, never copier's dev-version string for an untagged template.
+    # (Not resolved against history: CI checks out shallow and squash-merges drop commits.)
+    assert re.fullmatch(r"v?\d+\.\d+\.\d+|[0-9a-f]{7,40}", ANSWERS["_commit"]), ANSWERS["_commit"]
