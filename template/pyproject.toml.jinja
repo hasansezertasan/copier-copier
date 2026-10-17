@@ -1,7 +1,7 @@
 [project]
 name = "{{ repo_name }}"
 version = "0.0.0"
-description = "{{ description | replace('"', '\\"') }}"
+description = "{{ description | replace('\\', '\\\\') | replace('"', '\\"') }}"
 requires-python = ">={{ python_version }}"
 
 [dependency-groups]

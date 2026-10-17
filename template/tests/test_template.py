@@ -1,3 +1,4 @@
+import yaml
 from conftest import copier, git
 
 
@@ -21,4 +22,6 @@ def test_update_to_a_new_version_only_moves_the_answers_commit(tmp_path, version
     result = copier("update", "--defaults", "--skip-answered", cwd=dest)
     assert result.returncode == 0, result.stderr
     changed = {line[3:] for line in git("status", "--porcelain", cwd=dest).stdout.splitlines()}
-    assert changed <= {".copier-answers.yml"}
+    assert changed == {".copier-answers.yml"}
+    answers = yaml.safe_load((dest / ".copier-answers.yml").read_text())
+    assert answers["_commit"] == "v0.0.1"

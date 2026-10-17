@@ -21,12 +21,17 @@ jobs:
       contents: read
     steps:
       - name: Checkout repository
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
         with:
           persist-credentials: false
-      - name: Setup uv
-        uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884  # v10.3.0
-      - name: Refresh cobo sources
-        run: uvx cobo update
+      # Runs the cobo pinned in .config/mise.toml, so Renovate's pin is the version tested here.
+      - name: Install mise
+        uses: jdx/mise-action@9b200bcecbfd6303e69a4a261b2e09e3757440a7  # v5.2.0
+        with:
+          install: false
+          cache: false
       - name: Check for cobo drift
-        run: uvx cobo check
+        run: |
+          mise trust .config/mise.toml
+          mise install
+          mise run cobo-check

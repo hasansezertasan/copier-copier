@@ -44,6 +44,14 @@ def test_copy_tells_the_author_cobo_owns_the_boilerplate(render):
     assert "cobo gitignore dump" in result.stderr
 
 
+def test_drift_workflow_uses_the_pinned_cobo_and_fails_on_errors(rendered):
+    workflow = (rendered / ".github" / "workflows" / "cobo-drift.yml").read_text()
+    assert "uvx" not in workflow
+    assert "mise run cobo-check" in workflow
+    mise = tomllib.loads((rendered / ".config" / "mise.toml").read_text())
+    assert "--strict" in mise["tasks"]["cobo-check"]["run"]
+
+
 def test_cobo_is_pinned_in_mise_and_checked_weekly(rendered):
     mise = tomllib.loads((rendered / ".config" / "mise.toml").read_text())
     assert mise["tools"]["pipx:cobo"] == "0.6.0"

@@ -1,3 +1,4 @@
+import tomllib
 from pathlib import Path
 
 EXPECTED_ROOT = {
@@ -49,3 +50,11 @@ def test_python_version_has_one_source_that_mise_reads(render):
     mise = (dest / ".config" / "mise.toml").read_text()
     assert "read_file" in mise and ".python-version" in mise
     assert 'python = "3.' not in mise  # no literal pin to drift
+
+
+def test_description_survives_toml_escaping(render):
+    description = 'C:\\projects\\tmp "quoted" and a\\tab'
+    result, dest = render(description=description)
+    assert result.returncode == 0, result.stderr
+    parsed = tomllib.loads((dest / "pyproject.toml").read_text())
+    assert parsed["project"]["description"] == description
