@@ -1,7 +1,7 @@
 # Changes here will be overwritten by Copier; NEVER EDIT MANUALLY
 _commit: c9d196e
 _src_path: gh:hasansezertasan/copier-copier
-author_email: hasansezertasan@users.noreply.github.com
+author_email: hasansezertasan@gmail.com
 author_name: Hasan Sezer Tasan
 description: A Copier template that generates copier-<subject> template repositories.
 license: MIT
