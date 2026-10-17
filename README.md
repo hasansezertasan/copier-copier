@@ -13,7 +13,7 @@ You are asked for a **subject** (for example `pyproject`); the repo is named `co
 - `copier.yml` and a placeholder payload in `template/`
 - a pytest suite that renders the template and checks `copier update` (`mise run test`)
 - GitHub Actions for tests, release-please, PR-title and branch-name linting, plus Renovate config
-- lint configs and tool pins under `.config/`
+- lint configs and tool pins under `.config/`, with the Python version in a single `.python-version`
 
 `copier.yml`, `template/`, `tests/`, `README.md`, `AGENTS.md`, `pyproject.toml` and `CHANGELOG.md` are written once and then belong to you; `copier update` refreshes the rest.
 

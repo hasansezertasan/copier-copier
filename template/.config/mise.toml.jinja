@@ -1,8 +1,0 @@
-# Tools for this repo's own tests and CI. Renovate's mise manager reads the pins here.
-[tools]
-python = "{{ python_version }}"
-uv = "0.13.0"
-
-[tasks.test]
-description = "Run the template test suite"
-run = "uv run pytest"

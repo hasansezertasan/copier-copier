@@ -6,7 +6,7 @@ A Copier template repo. The payload lives in `template/`; everything else is sca
 
 - Branch names follow [Conventional Branch](https://conventional-branch.github.io/); commits and PR titles follow [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/). CI enforces both.
 - Any lint configs sit under `.config/`, never at the repo root. Tools that cannot read from there live elsewhere: Renovate and release-please in `.github/`, EditorConfig as `.editorconfig` at the root.
-- Tool versions are pinned in `.config/mise.toml` so Renovate's native `mise` manager covers them.
+- Tool versions are pinned in `.config/mise.toml` so Renovate's native `mise` manager covers them. The Python version is the exception: it lives in `.python-version`, which `mise.toml`, uv and Renovate all read (`PYTHON_VERSION` overrides it in mise).
 - Do not add `_tasks` to `copier.yml`: they make the template unsafe and force `--trust`, which Renovate's copier manager does not pass.
 - `template/.copier-answers.yml.jinja` (the answers-file template inside the payload) is what lets generated projects run `copier update`. Keep it.
 - Run the tests with `mise run test`.
