@@ -12,6 +12,7 @@ EXPECTED_ROOT = {
     "README.md",
     "copier.yml",
     "pyproject.toml",
+    "uv.lock",
     "template",
     "tests",
 }

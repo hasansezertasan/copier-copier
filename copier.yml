@@ -12,15 +12,8 @@ _skip_if_exists:
   - README.md
   - AGENTS.md
   - pyproject.toml
+  - uv.lock
   - .github/release-please-manifest.json
-
-_message_after_copy: |
-  Your template repo "copier-{{ subject }}" is ready in {{ _copier_conf.dst_path }}.
-
-  Next:
-    cd {{ _copier_conf.dst_path }}
-    git init && git add -A
-    mise install && mise run test
 
 subject:
   type: str

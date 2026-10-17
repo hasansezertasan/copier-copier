@@ -1,31 +1,11 @@
-import shutil
-import subprocess
-import sys
-
-from conftest import DEFAULT_ANSWERS, REPO
-
-IGNORE = shutil.ignore_patterns(".git", ".venv", "__pycache__", ".pytest_cache")
-
-
-def run(*args, cwd):
-    return subprocess.run(args, cwd=cwd, capture_output=True, text=True)
-
-
-def git(*args, cwd):
-    return run("git", "-c", "user.name=t", "-c", "user.email=t@example.com", *args, cwd=cwd)
+from conftest import DEFAULT_ANSWERS, REPO, copier, data_flags, git, versioned_copy
 
 
 def test_update_keeps_author_files_and_refreshes_scaffolding(tmp_path):
-    src = tmp_path / "copier-copier"
-    shutil.copytree(REPO, src, ignore=IGNORE)
-    git("init", "-q", "-b", "main", cwd=src)
-    git("add", "-A", cwd=src)
-    git("commit", "-q", "-m", "chore: initial", cwd=src)
-    git("tag", "v0.0.0", cwd=src)
+    src = versioned_copy(REPO, tmp_path / "copier-copier")
 
     dest = tmp_path / "copier-demo"
-    data = [f"--data={k}={v}" for k, v in DEFAULT_ANSWERS.items()]
-    first = run(sys.executable, "-m", "copier", "copy", "--defaults", *data, str(src), str(dest), cwd=tmp_path)
+    first = copier("copy", "--defaults", *data_flags(DEFAULT_ANSWERS), str(src), str(dest), cwd=tmp_path)
     assert first.returncode == 0, first.stderr
     git("init", "-q", "-b", "main", cwd=dest)
 
@@ -46,7 +26,7 @@ def test_update_keeps_author_files_and_refreshes_scaffolding(tmp_path):
     git("commit", "-q", "-am", "feat: new rule", cwd=src)
     git("tag", "v0.0.1", cwd=src)
 
-    update = run(sys.executable, "-m", "copier", "update", "--defaults", "--skip-answered", cwd=dest)
+    update = copier("update", "--defaults", "--skip-answered", cwd=dest)
     assert update.returncode == 0, update.stderr
 
     assert "# new scaffolding rule" in (dest / ".editorconfig").read_text()

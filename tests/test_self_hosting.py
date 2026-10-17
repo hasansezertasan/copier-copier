@@ -2,34 +2,46 @@
 
 Rendering the template with the answers recorded in the repo's own
 `.copier-answers.yml` must reproduce every file the template does not hand to the
-author via `_skip_if_exists`.
+author via `_skip_if_exists`, and every author-owned file must exist.
 """
 
 import filecmp
 
 import yaml
 
-from conftest import REPO, copier
+from conftest import REPO, copier, data_flags, git
+
+ANSWERS = yaml.safe_load((REPO / ".copier-answers.yml").read_text())
+SKIPPED = yaml.safe_load((REPO / "copier.yml").read_text())["_skip_if_exists"]
+
+
+def is_author_owned(rel: str) -> bool:
+    return any(rel == entry or rel.startswith(f"{entry}/") for entry in SKIPPED)
 
 
 def test_root_scaffolding_matches_a_fresh_render(tmp_path):
-    answers = yaml.safe_load((REPO / ".copier-answers.yml").read_text())
-    assert answers["_src_path"] == "gh:hasansezertasan/copier-copier"
-    data = [f"--data={k}={v}" for k, v in answers.items() if not k.startswith("_")]
-
+    answers = {k: v for k, v in ANSWERS.items() if not k.startswith("_")}
     dest = tmp_path / "fresh"
-    result = copier("copy", "--defaults", *data, str(REPO), str(dest), cwd=REPO)
+    result = copier("copy", "--defaults", *data_flags(answers), str(REPO), str(dest), cwd=REPO)
     assert result.returncode == 0, result.stderr
 
-    skipped = set(yaml.safe_load((REPO / "copier.yml").read_text())["_skip_if_exists"])
     drifted = []
     for fresh in sorted(p for p in dest.rglob("*") if p.is_file()):
-        rel = fresh.relative_to(dest)
-        if rel.as_posix() in skipped or rel.parts[0] in skipped:
-            continue
-        if rel.as_posix() == ".copier-answers.yml":
+        rel = fresh.relative_to(dest).as_posix()
+        if rel == ".copier-answers.yml" or is_author_owned(rel):
             continue
         mine = REPO / rel
         if not mine.is_file() or not filecmp.cmp(fresh, mine, shallow=False):
-            drifted.append(rel.as_posix())
+            drifted.append(rel)
     assert drifted == [], f"scaffolding drifted from the template: {drifted}"
+
+
+def test_author_owned_files_exist():
+    missing = [entry for entry in SKIPPED if not (REPO / entry).exists()]
+    assert missing == []
+
+
+def test_answers_file_is_anchored_to_the_published_template_and_a_real_commit():
+    assert ANSWERS["_src_path"] == "gh:hasansezertasan/copier-copier"
+    known = git("cat-file", "-e", f"{ANSWERS['_commit']}^{{commit}}", cwd=REPO)
+    assert known.returncode == 0, f"_commit {ANSWERS['_commit']} is not in this repo's history"
