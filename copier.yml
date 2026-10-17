@@ -1,0 +1,70 @@
+_subdirectory: template
+_min_copier_version: "9.10.3"
+_templates_suffix: .jinja
+_answers_file: .copier-answers.yml
+
+# Written once, then owned by the author (see docs/adr/0001-self-hosting-with-skip-if-exists.md).
+_skip_if_exists:
+  - copier.yml
+  - template
+  - tests
+  - CHANGELOG.md
+  - .github/release-please-manifest.json
+
+_message_after_copy: |
+  Your template repo "copier-{{ subject }}" is ready in {{ _copier_conf.dst_path }}.
+
+  Next:
+    cd {{ _copier_conf.dst_path }}
+    git init && git add -A
+    mise install && mise run test
+
+subject:
+  type: str
+  help: What the template generates, e.g. "pyproject". The repo is named copier-<subject>.
+  validator: >-
+    {% if not subject | regex_search('^[a-z0-9]+(-[a-z0-9]+)*$') %}
+    Use lowercase letters, digits and single hyphens, e.g. "pyproject" or "scoop-bucket".
+    {% endif %}
+
+description:
+  type: str
+  help: One-line description of the template repo
+  default: "A Copier template for {{ subject }}."
+
+owner:
+  type: str
+  help: GitHub owner of the repo
+  default: hasansezertasan
+
+author_name:
+  type: str
+  help: Author name, used in the LICENSE
+  default: Hasan Sezer Tasan
+
+author_email:
+  type: str
+  help: Author email
+
+license:
+  type: str
+  help: SPDX license identifier
+  default: MIT
+  choices:
+    - MIT
+    - Apache-2.0
+
+python_version:
+  type: str
+  help: Python version for the repo's own tests and tooling
+  default: "3.14"
+
+repo_name:
+  type: str
+  when: false
+  default: "copier-{{ subject }}"
+
+repo_url:
+  type: str
+  when: false
+  default: "https://github.com/{{ owner }}/copier-{{ subject }}"

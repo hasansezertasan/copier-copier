@@ -1,0 +1,11 @@
+# Template repo configuration. This file is yours: copier-copier wrote it once
+# and will not overwrite it on `copier update`.
+_subdirectory: template
+_min_copier_version: "9.10.3"
+_templates_suffix: .jinja
+_answers_file: .copier-answers.yml
+
+# Add questions for the projects this template generates, for example:
+# project_name:
+#   type: str
+#   help: Name of the generated project
