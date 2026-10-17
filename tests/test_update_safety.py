@@ -33,12 +33,14 @@ def test_update_keeps_author_files_and_refreshes_scaffolding(tmp_path):
     (dest / "copier.yml").write_text("_subdirectory: template\n# author edit\n")
     (dest / "template" / "real-file.txt").write_text("the real payload\n")
     (dest / "tests" / "test_template.py").write_text("# author edit\n")
+    (dest / "AGENTS.md").write_text("# author edit\n")
     git("add", "-A", cwd=dest)
     git("commit", "-q", "-m", "feat: real payload", cwd=dest)
 
     # The next copier-copier release touches scaffolding and author-owned seed files alike.
-    agents = src / "template" / "AGENTS.md.jinja"
-    agents.write_text(agents.read_text() + "- New scaffolding rule.\n")
+    editorconfig = src / "template" / ".editorconfig"
+    editorconfig.write_text(editorconfig.read_text() + "# new scaffolding rule\n")
+    (src / "template" / "AGENTS.md.jinja").write_text("# upstream rewrite\n")
     (src / "template" / "copier.yml").write_text("# upstream rewrite\n")
     (src / "template" / "tests" / "test_template.py").write_text("# upstream rewrite\n")
     git("commit", "-q", "-am", "feat: new rule", cwd=src)
@@ -47,7 +49,8 @@ def test_update_keeps_author_files_and_refreshes_scaffolding(tmp_path):
     update = run(sys.executable, "-m", "copier", "update", "--defaults", "--skip-answered", cwd=dest)
     assert update.returncode == 0, update.stderr
 
-    assert "New scaffolding rule." in (dest / "AGENTS.md").read_text()
+    assert "# new scaffolding rule" in (dest / ".editorconfig").read_text()
+    assert (dest / "AGENTS.md").read_text() == "# author edit\n"
     assert (dest / "copier.yml").read_text() == "_subdirectory: template\n# author edit\n"
     assert (dest / "template" / "real-file.txt").read_text() == "the real payload\n"
     assert (dest / "tests" / "test_template.py").read_text() == "# author edit\n"

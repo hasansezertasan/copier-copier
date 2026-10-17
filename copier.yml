@@ -9,6 +9,9 @@ _skip_if_exists:
   - template
   - tests
   - CHANGELOG.md
+  - README.md
+  - AGENTS.md
+  - pyproject.toml
   - .github/release-please-manifest.json
 
 _message_after_copy: |

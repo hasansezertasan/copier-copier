@@ -9,4 +9,4 @@ copier-copier applies itself to its own repo (its `.copier-answers.yml` points a
 
 ## Consequences
 
-The self-hosted copy lags one release behind. Testing local changes needs `copier update --vcs-ref=HEAD`.
+The self-hosted copy lags one release behind, and its `_commit` needs re-anchoring to the first release tag once one exists. Testing local changes needs `copier update --vcs-ref=HEAD`.

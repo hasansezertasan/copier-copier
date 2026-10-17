@@ -1,1 +1,27 @@
 # copier-copier
+
+A [Copier](https://copier.readthedocs.io) template that generates `copier-<subject>` template repositories.
+
+## Usage
+
+```bash
+copier copy gh:hasansezertasan/copier-copier path/to/copier-<subject>
+```
+
+You are asked for a **subject** (for example `pyproject`); the repo is named `copier-<subject>`. The generated repo has:
+
+- `copier.yml` and a placeholder payload in `template/`
+- a pytest suite that renders the template and checks `copier update` (`mise run test`)
+- GitHub Actions for tests, release-please, PR-title and branch-name linting, plus Renovate config
+- lint configs and tool pins under `.config/`
+
+`copier.yml`, `template/`, `tests/`, `README.md`, `AGENTS.md`, `pyproject.toml` and `CHANGELOG.md` are written once and then belong to you; `copier update` refreshes the rest.
+
+## Development
+
+```bash
+mise install
+mise run test
+```
+
+This repo applies itself: its scaffolding is kept in sync with `template/` (see `docs/adr/0001-self-hosting-with-skip-if-exists.md`).
