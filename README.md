@@ -34,7 +34,7 @@ For a `copier-*` repo that already exists, on a branch named `chore/adopt-copier
 
 2. Delete `template/PLACEHOLDER.md`. `_skip_if_exists: template` only skips files that already exist, so copier creates the placeholder inside your real payload. Once deleted it stays deleted: `copier update` does not recreate it.
 3. Restore what you want to keep, for example `git checkout -- LICENSE .github/release-please-config.json`. A customised `release-please-config.json` or `renovate.json` is overwritten by the seed, and `copier update` would overwrite it again.
-4. Replace `.gitignore` and `.editorconfig` with the cobo seeds from a fresh render, since existing files are skipped. Keep your own entries and stanzas below the end fence, then check the seals from a directory outside the repo, so mise does not parse an untrusted `.config/mise.toml` first: `cobo check --lock-file <repo>/cobo.lock`.
+4. Replace `.gitignore`, `.gitattributes` and `.editorconfig` with the cobo seeds from a fresh render, for each one your repo already has, since existing files are skipped and the seeded `cobo.lock` tracks all three. Keep your own entries and stanzas below the end fence, then check the seals from a directory outside the repo, so mise does not parse an untrusted `.config/mise.toml` first: `cobo check --lock-file <repo>/cobo.lock`.
 5. The seeded `tests/test_template.py` renders with `--defaults` only. If your template has questions without defaults, pass them with `--data=question=value` in its `copy` calls.
 6. Append the scaffolding conventions to your `AGENTS.md`, run `mise trust .config/mise.toml && mise run test`, and commit as `chore: adopt the copier-copier scaffolding`.
 
