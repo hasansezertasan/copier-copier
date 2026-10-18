@@ -5,7 +5,7 @@ A [Copier](https://copier.readthedocs.io) template that generates `copier-<subje
 ## Usage
 
 ```bash
-copier copy gh:hasansezertasan/copier-copier path/to/copier-<subject>
+copier copy https://github.com/hasansezertasan/copier-copier.git path/to/copier-<subject>
 ```
 
 You are asked for a **subject** (for example `pyproject`); the repo is named `copier-<subject>`. The generated repo has:
@@ -27,7 +27,7 @@ For a `copier-*` repo that already exists, on a branch named `chore/adopt-copier
    ```bash
    copier copy --overwrite --vcs-ref=<latest tag> \
      -d subject=<subject> -d description="..." -d author_email=... \
-     gh:hasansezertasan/copier-copier .
+     https://github.com/hasansezertasan/copier-copier.git .
    ```
 
    Files in the author-owned list above that already exist are skipped. The rest, including `LICENSE`, `.github/release-please-config.json`, `.github/renovate.json` and the workflows, are overwritten.

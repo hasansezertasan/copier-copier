@@ -71,3 +71,13 @@ def test_license_start_year_is_an_answer(render):
     result, dest = render(copyright_start_year="2019")
     assert result.returncode == 0, result.stderr
     assert "Copyright (c) 2019-present Example Author" in (dest / "LICENSE").read_text()
+
+
+def test_usage_commands_use_a_full_git_url_so_renovate_can_track_updates(render):
+    """Renovate resolves `_src_path` as a git remote; the `gh:` shortcut fails its lookup."""
+    result, dest = render()
+    assert result.returncode == 0, result.stderr
+    generated = (dest / "README.md").read_text()
+    assert "https://github.com/example/copier-demo.git" in generated
+    assert "gh:" not in generated
+    assert "gh:hasansezertasan/copier-copier" not in (Path(__file__).resolve().parent.parent / "README.md").read_text()

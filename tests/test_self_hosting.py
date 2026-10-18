@@ -45,7 +45,9 @@ def test_author_owned_files_exist():
 
 
 def test_answers_file_is_anchored_to_a_release_tag_of_the_published_template():
-    assert ANSWERS["_src_path"] == "gh:hasansezertasan/copier-copier"
+    # A full git URL, not the `gh:` shortcut: Renovate's copier manager looks `_src_path` up as a
+    # git remote and fails on the shortcut ("no-result"), so no update PRs are opened.
+    assert ANSWERS["_src_path"] == "https://github.com/hasansezertasan/copier-copier.git"
     # A release tag, so `copier update` has a version to walk from. (Not resolved against
     # history: CI checks out shallow and squash-merges drop commits.)
     assert re.fullmatch(r"v\d+\.\d+\.\d+", ANSWERS["_commit"]), ANSWERS["_commit"]
