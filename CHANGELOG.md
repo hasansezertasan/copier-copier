@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.1](https://github.com/hasansezertasan/copier-copier/compare/v0.1.0...v0.1.1) (2026-10-18)
+
+
+### Bug Fixes
+
+* anchor the self-hosted answers to the v0.1.0 release ([#4](https://github.com/hasansezertasan/copier-copier/issues/4)) ([20482b8](https://github.com/hasansezertasan/copier-copier/commit/20482b80f846a254603572ebc392a70ecce42d1f))
+* make .python-version author-owned ([#10](https://github.com/hasansezertasan/copier-copier/issues/10)) ([a4d8af0](https://github.com/hasansezertasan/copier-copier/commit/a4d8af082d167be2c6386fb0549c306772c1bfb7))
+
 ## 0.1.0 (2026-10-17)
 
 
