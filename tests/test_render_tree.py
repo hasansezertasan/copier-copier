@@ -58,3 +58,16 @@ def test_description_survives_toml_escaping(render):
     assert result.returncode == 0, result.stderr
     parsed = tomllib.loads((dest / "pyproject.toml").read_text())
     assert parsed["project"]["description"] == description
+
+
+def test_mit_license_names_the_holder_with_start_year_and_contact(render):
+    result, dest = render()
+    assert result.returncode == 0, result.stderr
+    first_lines = (dest / "LICENSE").read_text().splitlines()[:3]
+    assert "Copyright (c) 2026-present Example Author <author@example.com>" in first_lines
+
+
+def test_license_start_year_is_an_answer(render):
+    result, dest = render(copyright_start_year="2019")
+    assert result.returncode == 0, result.stderr
+    assert "Copyright (c) 2019-present Example Author" in (dest / "LICENSE").read_text()
