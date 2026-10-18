@@ -18,6 +18,26 @@ You are asked for a **subject** (for example `pyproject`); the repo is named `co
 
 `copier.yml`, `template/`, `tests/`, `README.md`, `AGENTS.md`, `pyproject.toml`, `uv.lock`, `cobo.lock`, `.github/release-please-manifest.json`, `.gitignore`, `.gitattributes`, `.editorconfig` and `.python-version` are written once and then belong to you; `copier update` refreshes the rest.
 
+## Adopting in an existing repo
+
+For a `copier-*` repo that already exists, on a branch named `chore/adopt-copier-copier-scaffolding`:
+
+1. Render over the repo, pinned to the latest release tag so `.copier-answers.yml` records a version `copier update` can walk from:
+
+   ```bash
+   copier copy --overwrite --vcs-ref=<latest tag> \
+     -d subject=<subject> -d description="..." -d author_email=... \
+     gh:hasansezertasan/copier-copier .
+   ```
+
+   Files in the author-owned list above that already exist are skipped. The rest, including `LICENSE`, `.github/release-please-config.json`, `.github/renovate.json` and the workflows, are overwritten.
+
+2. Delete `template/PLACEHOLDER.md`. `_skip_if_exists: template` only skips files that already exist, so copier creates the placeholder inside your real payload. Once deleted it stays deleted: `copier update` does not recreate it.
+3. Restore what you want to keep, for example `git checkout -- LICENSE .github/release-please-config.json`. A customised `release-please-config.json` or `renovate.json` is overwritten by the seed, and `copier update` would overwrite it again.
+4. Replace `.gitignore`, `.gitattributes` and `.editorconfig` with the cobo seeds from a fresh render, for each one your repo already has, since existing files are skipped and the seeded `cobo.lock` tracks all three. Keep your own entries and stanzas below the end fence, then check the seals from a directory outside the repo, so mise does not parse an untrusted `.config/mise.toml` first: `cobo check --lock-file <repo>/cobo.lock`.
+5. The seeded `tests/test_template.py` renders with `--defaults` only. If your template has questions without defaults, pass them with `--data=question=value` in its `copy` calls.
+6. Append the scaffolding conventions to your `AGENTS.md`, run `mise trust .config/mise.toml && mise run test`, and commit as `chore: adopt the copier-copier scaffolding`.
+
 ## Development
 
 ```bash
