@@ -77,16 +77,6 @@ python_version:
     Use 3.12 or newer, e.g. "3.14".
     {% endif %}
 
-seed_payload:
-  type: bool
-  default: true
-  help: Seed a placeholder payload in template/. Answer no when the repo already has its own template/.
-
-python_harness:
-  type: bool
-  default: true
-  help: Seed the Python test harness (pyproject.toml, uv.lock, tests/, test.yml). Answer no for a repo that tests differently.
-
 repo_name:
   type: str
   when: false
