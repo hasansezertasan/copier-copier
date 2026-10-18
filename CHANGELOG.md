@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.0](https://github.com/hasansezertasan/copier-copier/compare/v0.1.1...v0.2.0) (2026-10-18)
+
+
+### 🚀 Features
+
+* group changelog entries by type in the release-please seed ([#11](https://github.com/hasansezertasan/copier-copier/issues/11)) ([e839032](https://github.com/hasansezertasan/copier-copier/commit/e839032ee4ab724689649885ce85121aa4b9bb03))
+
 ## [0.1.1](https://github.com/hasansezertasan/copier-copier/compare/v0.1.0...v0.1.1) (2026-10-18)
 
 
