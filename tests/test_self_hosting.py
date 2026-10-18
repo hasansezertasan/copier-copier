@@ -23,7 +23,9 @@ def is_author_owned(rel: str) -> bool:
 def test_root_scaffolding_matches_a_fresh_render(tmp_path):
     answers = {k: v for k, v in ANSWERS.items() if not k.startswith("_")}
     dest = tmp_path / "fresh"
-    result = copier("copy", "--defaults", *data_flags(answers), str(REPO), str(dest), cwd=REPO)
+    result = copier(
+        "copy", "--defaults", "--vcs-ref=HEAD", *data_flags(answers), str(REPO), str(dest), cwd=REPO
+    )
     assert result.returncode == 0, result.stderr
 
     drifted = []

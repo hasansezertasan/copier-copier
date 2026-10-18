@@ -53,7 +53,10 @@ def render(tmp_path):
     def _render(**overrides):
         dest = tmp_path / "out"
         answers = {**DEFAULT_ANSWERS, **overrides}
-        result = copier("copy", "--defaults", *data_flags(answers), str(REPO), str(dest), cwd=REPO)
+        # --vcs-ref=HEAD: without it copier renders the latest tag once the tree is clean.
+        result = copier(
+            "copy", "--defaults", "--vcs-ref=HEAD", *data_flags(answers), str(REPO), str(dest), cwd=REPO
+        )
         return result, dest
 
     return _render
