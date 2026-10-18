@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.2.1](https://github.com/hasansezertasan/copier-copier/compare/v0.2.0...v0.2.1) (2026-10-18)
+
+
+### 🐛 Bug Fixes
+
+* add the copyright year and contact to the LICENSE template ([#19](https://github.com/hasansezertasan/copier-copier/issues/19)) ([6ad749b](https://github.com/hasansezertasan/copier-copier/commit/6ad749b2f874b179c2089138272b3cae4ca3c3f6))
+* record a full git URL as _src_path so Renovate can track template updates ([#20](https://github.com/hasansezertasan/copier-copier/issues/20)) ([2511d76](https://github.com/hasansezertasan/copier-copier/commit/2511d768adb60339e57eb61c7d2f714b9f20ff3d))
+
+
+### 📝 Documentation
+
+* document adopting copier-copier in an existing repo ([#13](https://github.com/hasansezertasan/copier-copier/issues/13)) ([6587cdd](https://github.com/hasansezertasan/copier-copier/commit/6587cdd7d6567ffb6a9fc08908494be8b037d2d8))
+* document that copier update recreates deleted seeded files ([#18](https://github.com/hasansezertasan/copier-copier/issues/18)) ([ec4c49a](https://github.com/hasansezertasan/copier-copier/commit/ec4c49a1937f12cfd143585800245470cc4844b1))
+* record that LICENSE stays out of cobo ([#21](https://github.com/hasansezertasan/copier-copier/issues/21)) ([a3c97ca](https://github.com/hasansezertasan/copier-copier/commit/a3c97ca32a0d5acb821abcf1ca6f9ba04ac4e2b9))
+
 ## [0.2.0](https://github.com/hasansezertasan/copier-copier/compare/v0.1.1...v0.2.0) (2026-10-18)
 
 
