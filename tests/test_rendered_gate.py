@@ -30,7 +30,7 @@ def test_lock_floor_does_not_depend_on_the_chosen_python(tmp_path, render):
     from conftest import REPO, copier, data_flags, DEFAULT_ANSWERS
 
     answers = {**DEFAULT_ANSWERS, "python_version": "3.12"}
-    assert copier("copy", "--defaults", *data_flags(answers), str(REPO), str(other), cwd=REPO).returncode == 0
+    assert copier("copy", "--defaults", "--vcs-ref=HEAD", *data_flags(answers), str(REPO), str(other), cwd=REPO).returncode == 0
     floor = lambda d: tomllib.loads((d / "pyproject.toml").read_text())["project"]["requires-python"]
     assert floor(dest) == floor(other) == ">=3.12"
     assert (dest / "uv.lock").read_text() == (other / "uv.lock").read_text()
