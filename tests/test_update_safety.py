@@ -15,6 +15,7 @@ def test_update_keeps_author_files_and_refreshes_scaffolding(tmp_path):
     (dest / "tests" / "test_template.py").write_text("# author edit\n")
     (dest / "AGENTS.md").write_text("# author edit\n")
     (dest / ".gitignore").write_text("# author edit\n")
+    (dest / ".python-version").write_text("3.99\n")
     git("add", "-A", cwd=dest)
     git("commit", "-q", "-m", "feat: real payload", cwd=dest)
 
@@ -22,6 +23,7 @@ def test_update_keeps_author_files_and_refreshes_scaffolding(tmp_path):
     workflow = src / "template" / ".github" / "workflows" / "test.yml"
     workflow.write_text(workflow.read_text() + "# new scaffolding rule\n")
     (src / "template" / ".gitignore").write_text("# upstream rewrite\n")
+    (src / "template" / ".python-version.jinja").write_text("3.13\n")
     (src / "template" / "AGENTS.md.jinja").write_text("# upstream rewrite\n")
     (src / "template" / "copier.yml").write_text("# upstream rewrite\n")
     (src / "template" / "tests" / "test_template.py").write_text("# upstream rewrite\n")
@@ -33,6 +35,7 @@ def test_update_keeps_author_files_and_refreshes_scaffolding(tmp_path):
 
     assert "# new scaffolding rule" in (dest / ".github" / "workflows" / "test.yml").read_text()
     assert (dest / ".gitignore").read_text() == "# author edit\n"
+    assert (dest / ".python-version").read_text() == "3.99\n"
     assert (dest / "AGENTS.md").read_text() == "# author edit\n"
     assert (dest / "copier.yml").read_text() == "_subdirectory: template\n# author edit\n"
     assert (dest / "template" / "real-file.txt").read_text() == "the real payload\n"

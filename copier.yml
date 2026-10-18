@@ -17,6 +17,8 @@ _skip_if_exists:
   - .gitignore
   - .gitattributes
   - .editorconfig
+  # The author picks their Python; `copier update` must not fight a version bump.
+  - .python-version
   - .github/release-please-manifest.json
 
 # A message, not a task: `_tasks` would force --trust and stop Renovate's copier
