@@ -60,6 +60,15 @@ author_email:
   type: str
   help: Author email
 
+copyright_start_year:
+  type: str
+  help: First year of the LICENSE copyright line, rendered as "<year>-present" so it never goes stale
+  default: "2026"
+  validator: >-
+    {% if not copyright_start_year | regex_search('^(19|20)[0-9]{2}$') %}
+    Use a four-digit year, e.g. "2026".
+    {% endif %}
+
 license:
   type: str
   help: SPDX license identifier
