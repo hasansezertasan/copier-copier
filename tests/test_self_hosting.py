@@ -42,8 +42,8 @@ def test_author_owned_files_exist():
     assert missing == []
 
 
-def test_answers_file_is_anchored_to_the_published_template():
+def test_answers_file_is_anchored_to_a_release_tag_of_the_published_template():
     assert ANSWERS["_src_path"] == "gh:hasansezertasan/copier-copier"
-    # A tag or a commit sha, never copier's dev-version string for an untagged template.
-    # (Not resolved against history: CI checks out shallow and squash-merges drop commits.)
-    assert re.fullmatch(r"v?\d+\.\d+\.\d+|[0-9a-f]{7,40}", ANSWERS["_commit"]), ANSWERS["_commit"]
+    # A release tag, so `copier update` has a version to walk from. (Not resolved against
+    # history: CI checks out shallow and squash-merges drop commits.)
+    assert re.fullmatch(r"v\d+\.\d+\.\d+", ANSWERS["_commit"]), ANSWERS["_commit"]
