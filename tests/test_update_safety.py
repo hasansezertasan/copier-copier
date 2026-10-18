@@ -20,20 +20,20 @@ def test_update_keeps_author_files_and_refreshes_scaffolding(tmp_path):
     git("commit", "-q", "-m", "feat: real payload", cwd=dest)
 
     # The next copier-copier release touches scaffolding and author-owned seed files alike.
-    workflow = src / "template" / ".github" / "workflows" / "test.yml"
+    workflow = src / "template" / ".github" / "workflows" / "release.yml"
     workflow.write_text(workflow.read_text() + "# new scaffolding rule\n")
     (src / "template" / ".gitignore").write_text("# upstream rewrite\n")
     (src / "template" / ".python-version.jinja").write_text("3.13\n")
     (src / "template" / "AGENTS.md.jinja").write_text("# upstream rewrite\n")
     (src / "template" / "copier.yml").write_text("# upstream rewrite\n")
-    (src / "template" / "tests" / "test_template.py").write_text("# upstream rewrite\n")
+    (src / "template" / "{% if python_harness %}tests{% endif %}" / "test_template.py").write_text("# upstream rewrite\n")
     git("commit", "-q", "-am", "feat: new rule", cwd=src)
     git("tag", "v0.0.1", cwd=src)
 
     update = copier("update", "--defaults", "--skip-answered", cwd=dest)
     assert update.returncode == 0, update.stderr
 
-    assert "# new scaffolding rule" in (dest / ".github" / "workflows" / "test.yml").read_text()
+    assert "# new scaffolding rule" in (dest / ".github" / "workflows" / "release.yml").read_text()
     assert (dest / ".gitignore").read_text() == "# author edit\n"
     assert (dest / ".python-version").read_text() == "3.99\n"
     assert (dest / "AGENTS.md").read_text() == "# author edit\n"

@@ -12,7 +12,9 @@ copier copy gh:{{ owner }}/{{ repo_name }} path/to/project
 
 ```bash
 mise install
+{% if python_harness -%}
 mise run test
+{% endif -%}
 ```
 
 Generated from [copier-copier](https://github.com/hasansezertasan/copier-copier).
