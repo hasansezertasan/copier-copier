@@ -56,3 +56,10 @@ def test_cobo_is_pinned_in_mise_and_checked_weekly(rendered):
     mise = tomllib.loads((rendered / ".config" / "mise.toml").read_text())
     assert mise["tools"]["pipx:cobo"] == "0.6.0"
     assert (rendered / ".github" / "workflows" / "cobo-drift.yml").is_file()
+
+
+def test_seeded_template_config_documents_the_seed_once_contract(render):
+    result, dest = render()
+    assert result.returncode == 0, result.stderr
+    text = (dest / "copier.yml").read_text()
+    assert "_skip_if_exists" in text and "cobo.lock" in text

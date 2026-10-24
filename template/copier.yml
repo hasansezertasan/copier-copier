@@ -9,3 +9,13 @@ _answers_file: .copier-answers.yml
 # project_name:
 #   type: str
 #   help: Name of the generated project
+
+# Files a generated project owns after the first render, so `copier update` leaves them
+# alone. When this template's payload ships cobo-managed boilerplate, list `.gitignore` and
+# `cobo.lock` (only the files the generated project's own `cobo.lock` tracks; a plain
+# `.gitattributes` or `.editorconfig` nothing re-renders should keep receiving updates):
+# _skip_if_exists:
+#   - .gitignore
+#   - cobo.lock
+# `_skip_if_exists` also applies to `copier copy --overwrite`: adopt an existing project by
+# deleting its `.gitignore` and `cobo.lock` first, so the pair stays matched.
