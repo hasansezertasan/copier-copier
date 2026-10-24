@@ -188,5 +188,5 @@ def test_the_guide_qualifies_when_the_pull_request_target_checks_do_not_run_on_r
     assert "approval-required state" in guide
     assert "`pull_request_target` checks" in guide
     assert "do not run when release-please\n  creates or updates the PR" in guide
-    assert "editing the PR or reopening it by hand starts them" in guide
+    assert "Reopening it by hand starts both" in guide
     assert "never run on that PR" not in guide
