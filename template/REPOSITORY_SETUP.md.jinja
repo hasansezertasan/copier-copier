@@ -134,8 +134,10 @@ Run from the repository root.
 ```
 
 These are text checks, on purpose. They do not parse YAML, so an exotic spelling of a key can slip through, and
-they only require an `https://` `_src_path` with a host and a path; they cannot tell whether it names the right repository. A
-stricter check would need a YAML parser in this block, which the guide deliberately does not assume.
+they only require an `https://` `_src_path` with a host and a path; they cannot tell whether it names the right repository. The
+custom-delimiter fallback for convention 4 likewise matches the two `_envops` lines as text: it does not check that they sit
+under the top-level `_envops` mapping. A stricter check would need a YAML parser in this block, which the guide deliberately
+does not assume.
 
 Conventions 5 and 6 have no scriptable check. `mise run test` renders the template and walks a
 `copier update`, which catches a payload that does not render, but not a project-owned file that is missing
