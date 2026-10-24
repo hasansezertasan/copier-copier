@@ -132,5 +132,9 @@ from `_skip_if_exists`: the update test tags an empty commit, so both versions r
 ## Known limitations
 
 - When release-please opens a release PR or updates its branch with `GITHUB_TOKEN`, the `pull_request` workflows
-  start in an approval-required state (`action_required`). A user with write access approves them, then waits for
-  the required status checks before merging.
+  start in an approval-required state (`action_required`) and run once a user with write access approves them.
+  The `pull_request_target` checks (`Validate PR title`, `Validate branch name`) do not run when release-please
+  creates or updates the PR with `GITHUB_TOKEN`. Reopening it by hand starts both, and editing its title starts the
+  title check, because those events come from you and not from the token. No ruleset here requires them, so the release PR merges after
+  approval; if you add a ruleset that requires them, trigger them that way or give repository admins a bypass
+  through a pull request.
