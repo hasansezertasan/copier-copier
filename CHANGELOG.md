@@ -1,5 +1,25 @@
 # Changelog
 
+## [0.3.0](https://github.com/hasansezertasan/copier-copier/compare/v0.2.1...v0.3.0) (2026-10-24)
+
+
+### 🚀 Features
+
+* add a REPOSITORY_SETUP.md that enforces the template conventions ([#23](https://github.com/hasansezertasan/copier-copier/issues/23)) ([72252ad](https://github.com/hasansezertasan/copier-copier/commit/72252ade61bca95db06295ad7005425891558ab9))
+* seed generated templates with the seed-once guidance for cobo files ([#28](https://github.com/hasansezertasan/copier-copier/issues/28)) ([956edce](https://github.com/hasansezertasan/copier-copier/commit/956edceba4348c89a554ec615cea76d91f6ab0a6))
+
+
+### 🐛 Bug Fixes
+
+* say the pull_request_target checks never run on release PRs ([#27](https://github.com/hasansezertasan/copier-copier/issues/27)) ([3800912](https://github.com/hasansezertasan/copier-copier/commit/38009129fc984d8af6c169e95308c630dc101128))
+
+
+### 📝 Documentation
+
+* record why the dashboard pin lives in mise conf.d ([#25](https://github.com/hasansezertasan/copier-copier/issues/25)) ([f51ec3a](https://github.com/hasansezertasan/copier-copier/commit/f51ec3a3e7fa9512e437f4bb39fbc6a6cdfb549a))
+* record why the template conventions are checked from the setup guide ([#26](https://github.com/hasansezertasan/copier-copier/issues/26)) ([03897ad](https://github.com/hasansezertasan/copier-copier/commit/03897ad5f08ec84b869763b8fcd65293eafd60d4))
+* set up Keep the Why and record the ADR decisions in context/ ([#22](https://github.com/hasansezertasan/copier-copier/issues/22)) ([8074827](https://github.com/hasansezertasan/copier-copier/commit/807482743b77045d24c16896f83103aed67786f5))
+
 ## [0.2.1](https://github.com/hasansezertasan/copier-copier/compare/v0.2.0...v0.2.1) (2026-10-18)
 
 
