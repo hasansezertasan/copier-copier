@@ -190,3 +190,20 @@ def test_the_guide_qualifies_when_the_pull_request_target_checks_do_not_run_on_r
     assert "do not run when release-please\n  creates or updates the PR" in guide
     assert "Reopening it by hand starts both" in guide
     assert "never run on that PR" not in guide
+
+
+def test_a_payload_with_custom_delimiters_passes_with_its_answers_file_template(render):
+    dest = rendered(render)
+    (dest / "template" / ".copier-answers.yml.jinja").rename(
+        dest / "template" / "[[ _copier_conf.answers_file ]].jinja"
+    )
+    check = run_check(dest)
+    assert check.returncode == 0, check.stdout + check.stderr
+
+
+def test_a_payload_without_any_answers_file_template_fails_the_check(render):
+    dest = rendered(render)
+    (dest / "template" / ".copier-answers.yml.jinja").unlink()
+    check = run_check(dest)
+    assert check.returncode != 0
+    assert "is missing" in check.stdout + check.stderr
