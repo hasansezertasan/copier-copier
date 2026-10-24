@@ -3,6 +3,8 @@ import subprocess
 
 import pytest
 
+from conftest import REPO
+
 BACK_REFERENCE = "## Credits\n\nGenerated from [copier-demo](https://github.com/example/copier-demo).\n"
 
 
@@ -91,3 +93,10 @@ def test_the_generated_readme_credits_copier_copier_under_its_own_heading(render
     assert (dest / "README.md").read_text().rstrip().endswith(
         "## Credits\n\nGenerated from [copier-copier](https://github.com/hasansezertasan/copier-copier)."
     )
+
+
+def test_this_repos_own_guide_passes_its_own_convention_checks():
+    """copier-copier is self-hosted, so the checks it ships must pass on its own tree."""
+    script = conventions_check((REPO / "REPOSITORY_SETUP.md").read_text())
+    check = subprocess.run(["bash", "-c", script], cwd=REPO, capture_output=True, text=True, check=False)
+    assert check.returncode == 0, check.stdout + check.stderr

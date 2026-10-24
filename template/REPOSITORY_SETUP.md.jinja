@@ -109,8 +109,10 @@ Run from the repository root.
   fi
   # 3. No tasks, quoted or not.
   if grep -Eq "^[[:space:]]*['\"]?_tasks['\"]?[[:space:]]*:" copier.yml; then fail "copier.yml: has _tasks"; fi
-  # 4. The answers-file template is in the payload, under exactly this name.
-  [ -f template/.copier-answers.yml.jinja ] || fail "template/.copier-answers.yml.jinja is missing"
+  # 4. The answers-file template is in the payload, under exactly this name. (A template that itself
+  #    generates template repos, like copier-copier, keeps it one level down with a doubled suffix.)
+  [ -f template/.copier-answers.yml.jinja ] || [ -f template/template/.copier-answers.yml.jinja.jinja ] \
+    || fail "template/.copier-answers.yml.jinja is missing"
 )
 ```
 
