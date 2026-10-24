@@ -1,5 +1,7 @@
 # copier-copier
 
+[![Keep the Why · live](https://hasansezertasan.github.io/copier-copier/dashboard/live/badge-entries.svg)](https://hasansezertasan.github.io/copier-copier/dashboard/live/)
+
 A [Copier](https://copier.readthedocs.io) template that generates `copier-<subject>` template repositories.
 
 ## Usage
