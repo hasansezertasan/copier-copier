@@ -1,0 +1,118 @@
+# Repository setup
+
+One-time GitHub settings and the conventions every template repo keeps. The settings are not files, so
+they cannot be reviewed in a pull request: do them before merging the first release PR. The conventions are
+files, and the checks at the end prove them.
+
+Each step is tagged:
+
+- **[AGENT]**: a `gh` command that can run unattended. Nothing to replace: the commands already name `hasansezertasan/copier-copier`.
+- **[HUMAN]**: browser-only work.
+- **[CHECK]**: a scriptable verification, or an explicit "no scriptable check".
+
+## Releases
+
+Releases are automatic from Conventional Commits; nobody tags by hand.
+
+1. Merge PRs to `main` with Conventional Commit titles (`feat:`, `fix:`, ...).
+2. release-please keeps one release PR open and writes `CHANGELOG.md`.
+3. Merging that PR tags the commit (`v0.1.0`, ...) and cuts a GitHub release.
+
+The tags matter: they are what `copier update` walks in every project generated from this template, so a
+hand-made or deleted tag breaks their updates.
+
+## Squash-only merges
+
+The PR title becomes the commit and the changelog line, so merge by squash only.
+
+**[AGENT]**
+
+```sh
+gh api -X PATCH repos/hasansezertasan/copier-copier \
+  -F allow_squash_merge=true -F allow_merge_commit=false -F allow_rebase_merge=false \
+  -F delete_branch_on_merge=true
+```
+
+**[CHECK]**
+
+```sh
+gh api repos/hasansezertasan/copier-copier \
+  --jq '.allow_squash_merge and (.allow_merge_commit | not) and (.allow_rebase_merge | not)' | grep -qx true
+```
+
+## Let Actions open the release PR
+
+release-please runs as a GitHub Action and opens the release pull request.
+
+**[AGENT]**
+
+```sh
+gh api -X PUT repos/hasansezertasan/copier-copier/actions/permissions/workflow \
+  -F default_workflow_permissions=read \
+  -F can_approve_pull_request_reviews=true
+```
+
+**[CHECK]**
+
+```sh
+gh api repos/hasansezertasan/copier-copier/actions/permissions/workflow \
+  --jq '.can_approve_pull_request_reviews == true and .default_workflow_permissions == "read"' | grep -qx true
+```
+
+## Renovate
+
+**[HUMAN]** Install the Renovate GitHub app on the repository. `.github/renovate.json` extends the shared preset.
+
+**[CHECK]** No scriptable check: Renovate opens its onboarding or dependency dashboard issue after installation.
+
+## Template conventions
+
+A template repo is only useful if projects can keep updating from it, so these hold for every one. Each has a
+check in the next section.
+
+1. **The payload's README links back.** Once `template/` has a README, it ends with
+   `Generated from [copier-copier](https://github.com/hasansezertasan/copier-copier).`, so a generated project says where it came from.
+2. **`_src_path` is a full git URL.** Usage commands say `copier copy https://github.com/hasansezertasan/copier-copier.git ...`, never the
+   `gh:` shortcut: Renovate's copier manager looks `_src_path` up as a git remote and fails on the shortcut,
+   so no update PR is opened.
+3. **No `_tasks` in `copier.yml`.** A task makes the template unsafe and forces `--trust`, which Renovate's
+   copier manager does not pass. Print next steps with `_message_after_copy` instead.
+4. **The payload ships its answers file.** `template/.copier-answers.yml.jinja` is what lets generated
+   projects run `copier update`.
+5. **Files a project owns are listed in `_skip_if_exists`.** Anything the template must keep refreshing,
+   such as workflows, stays out of it.
+6. **Payloads full of `${{ ... }}` or bash `[[ ]]` use their own Jinja delimiters** (`_envops`), and only
+   files with the `.jinja` suffix are rendered.
+
+## Checking the conventions
+
+Run from the repository root.
+
+**[CHECK]**
+
+```sh
+(
+  set -e
+  # 1. The payload README, if there is one, ends with the back reference.
+  for readme in template/README.md template/README.md.jinja; do
+    [ -f "$readme" ] || continue
+    tail -n 3 "$readme" | grep -qF 'Generated from [copier-copier](https://github.com/hasansezertasan/copier-copier).'
+  done
+  # 2. Usage commands use the full git URL.
+  grep -qF 'copier copy https://github.com/hasansezertasan/copier-copier.git' README.md
+  ! grep -q 'gh:' README.md
+  # 3. No tasks.
+  ! grep -q '^_tasks' copier.yml
+  # 4. The answers-file template is in the payload.
+  ls template/.copier-answers.yml.jinja* >/dev/null
+)
+```
+
+Conventions 5 and 6 have no scriptable check: `mise run test` renders the template and walks a
+`copier update`, which fails when either is wrong.
+
+## Known limitations
+
+- A pull request opened with `GITHUB_TOKEN` (the release PR) does not trigger other workflows, so required
+  status checks stay pending on it. Merge it as a repository admin, or do not require checks for
+  `release-please--*` branches.

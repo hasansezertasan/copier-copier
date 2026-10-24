@@ -13,6 +13,7 @@ EXPECTED_ROOT = {
     "LICENSE",
     "cobo.lock",
     "README.md",
+    "REPOSITORY_SETUP.md",
     "copier.yml",
     "pyproject.toml",
     "uv.lock",
