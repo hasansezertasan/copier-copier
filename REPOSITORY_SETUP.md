@@ -105,7 +105,7 @@ Run from the repository root.
   # 2. Usage commands and the recorded _src_path use the full git URL, never the gh: shortcut.
   grep -qF 'copier copy https://github.com/hasansezertasan/copier-copier.git' README.md || fail "README.md: usage must say copier copy https://github.com/hasansezertasan/copier-copier.git"
   if grep -q 'gh:' README.md; then fail "README.md: uses the gh: shortcut"; fi
-  if [ -f .copier-answers.yml ] && grep -Eq '^_src_path:[[:space:]]*gh:' .copier-answers.yml; then
+  if [ -f .copier-answers.yml ] && grep -Eq "^_src_path:[[:space:]]*['\"]?gh:" .copier-answers.yml; then
     fail ".copier-answers.yml: _src_path uses the gh: shortcut"
   fi
   # 3. No tasks, quoted or not.

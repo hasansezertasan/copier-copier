@@ -67,9 +67,12 @@ def test_the_gh_shortcut_in_the_readme_fails_the_check(render):
     assert run_check(dest).returncode != 0
 
 
-def test_the_gh_shortcut_in_the_answers_file_fails_the_check(render):
+@pytest.mark.parametrize(
+    "value", ["gh:hasansezertasan/copier-copier", "'gh:hasansezertasan/copier-copier'", '"gh:hasansezertasan/copier-copier"']
+)
+def test_the_gh_shortcut_in_the_answers_file_fails_the_check_however_it_is_quoted(render, value):
     dest = rendered(render)
-    (dest / ".copier-answers.yml").write_text("_src_path: gh:hasansezertasan/copier-copier\n_commit: v0.1.0\n")
+    (dest / ".copier-answers.yml").write_text(f"_src_path: {value}\n_commit: v0.1.0\n")
     assert run_check(dest).returncode != 0
 
 
