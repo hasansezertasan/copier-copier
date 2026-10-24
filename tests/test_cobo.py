@@ -71,5 +71,6 @@ def test_seeded_template_config_documents_the_seed_once_contract(render):
         "#   - cobo.lock",
     ):
         assert line in text.splitlines(), line
+    assert "every file the generated project's own `cobo.lock` tracks" in text
     assert "`copier copy --overwrite`" in text
     assert "restore the project's own rules below the end fence" in text

@@ -4,7 +4,7 @@
 
 ## Decision
 
-The seeded `copier.yml` carries a commented `_skip_if_exists` block naming `.gitignore` and `cobo.lock`, with two notes the author needs: list only files the generated project's own `cobo.lock` tracks (a plain `.gitattributes` or `.editorconfig` nothing re-renders keeps receiving updates), and `_skip_if_exists` also applies to `copier copy --overwrite`, so an adopter who wants the payload's pair copies their own aside and deletes both files first, then restores their own rules below the end fence and re-dumps the cobo sources they used; an adopter who wants to keep their pair leaves both in place.
+The seeded `copier.yml` carries a commented `_skip_if_exists` block naming `.gitignore` and `cobo.lock`, with two notes the author needs: list `cobo.lock` and every file the generated project's own `cobo.lock` tracks, and nothing else (`.gitignore` is the usual one; `.gitattributes` or `.editorconfig` belong in the list only when cobo manages them too, while a plain file nothing re-renders keeps receiving updates), and `_skip_if_exists` also applies to `copier copy --overwrite`, so an adopter who wants the payload's pair copies their own aside and deletes both files first, then restores their own rules below the end fence and re-dumps the cobo sources they used; an adopter who wants to keep their pair leaves both in place.
 
 ## Considered Options
 
