@@ -125,8 +125,9 @@ Run from the repository root.
     config=copier.yml
   fi
   #    A payload with its own Jinja delimiters (convention 6) spells the same file with them, but only
-  #    when that copier.yml really configures `[[` as the variable start.
+  #    when that copier.yml really configures `[[` and `]]` as the variable delimiters.
   if grep -Eq "^[[:space:]]*['\"]?variable_start_string['\"]?[[:space:]]*:[[:space:]]*['\"]?\[\[" "$config" \
+    && grep -Eq "^[[:space:]]*['\"]?variable_end_string['\"]?[[:space:]]*:[[:space:]]*['\"]?\]\]" "$config" \
     && [ -f "$delimited" ]; then answers=$delimited; fi
   [ -f "$answers" ] || fail "$answers is missing"
 )
