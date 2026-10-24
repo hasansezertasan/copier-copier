@@ -106,10 +106,9 @@ Run from the repository root.
   # 2. Usage commands and the recorded _src_path (where this repo was generated from) use a full git URL.
   grep -qF 'copier copy https://github.com/hasansezertasan/copier-copier.git' README.md || fail "README.md: usage must say copier copy https://github.com/hasansezertasan/copier-copier.git"
   if grep -q 'gh:' README.md; then fail "README.md: uses the gh: shortcut"; fi
-  if [ -f .copier-answers.yml ]; then
-    grep -Eq "^['\"]?_src_path['\"]?:[[:space:]]*['\"]?https://" .copier-answers.yml \
-      || fail ".copier-answers.yml: _src_path must be a full https git URL, not gh: or a local path"
-  fi
+  [ -f .copier-answers.yml ] || fail ".copier-answers.yml is missing: copier update needs it to know which release generated this repo"
+  grep -Eq "^['\"]?_src_path['\"]?:[[:space:]]*['\"]?https://" .copier-answers.yml \
+    || fail ".copier-answers.yml: _src_path must be a full https git URL, not gh: or a local path"
   # 3. No tasks, quoted or not.
   if grep -Eq "^[[:space:]]*['\"]?_tasks['\"]?[[:space:]]*:" copier.yml; then fail "copier.yml: has _tasks"; fi
   # 4. The answers-file template is in the payload, under exactly this name. A payload that is itself
@@ -120,6 +119,10 @@ Run from the repository root.
   [ -f "$answers" ] || fail "$answers is missing"
 )
 ```
+
+These are text checks, on purpose. They do not parse YAML, so an exotic spelling of a key can slip through, and
+they only require a full `https://` `_src_path`; they cannot tell whether it names the right repository. A
+stricter check would need a YAML parser in this block, which the guide deliberately does not assume.
 
 Conventions 5 and 6 have no scriptable check. `mise run test` renders the template and walks a
 `copier update`, which catches a payload that does not render, but not a project-owned file that is missing

@@ -116,6 +116,12 @@ def test_tasks_fail_the_check_however_the_key_is_quoted(render, key):
     assert run_check(dest).returncode != 0
 
 
+def test_a_missing_answers_file_fails_the_check(render):
+    dest = rendered(render)
+    (dest / ".copier-answers.yml").unlink()
+    assert run_check(dest).returncode != 0
+
+
 def test_a_missing_answers_template_fails_even_when_a_backup_remains(render):
     dest = rendered(render)
     answers = dest / "template" / ".copier-answers.yml.jinja"
