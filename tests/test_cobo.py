@@ -4,6 +4,7 @@ import shutil
 import tomllib
 
 import pytest
+import yaml
 
 from conftest import run
 
@@ -56,3 +57,20 @@ def test_cobo_is_pinned_in_mise_and_checked_weekly(rendered):
     mise = tomllib.loads((rendered / ".config" / "mise.toml").read_text())
     assert mise["tools"]["pipx:cobo"] == "0.6.0"
     assert (rendered / ".github" / "workflows" / "cobo-drift.yml").is_file()
+
+
+def test_seeded_template_config_documents_the_seed_once_contract(render):
+    result, dest = render()
+    assert result.returncode == 0, result.stderr
+    text = (dest / "copier.yml").read_text()
+    # The guidance stays a comment: the placeholder payload ships no cobo files.
+    assert "_skip_if_exists" not in yaml.safe_load(text)
+    for line in (
+        "# _skip_if_exists:",
+        "#   - .gitignore",
+        "#   - cobo.lock",
+    ):
+        assert line in text.splitlines(), line
+    assert "every file the generated project's own `cobo.lock` tracks" in text
+    assert "`copier copy --overwrite`" in text
+    assert "restore the project's own rules below the end fence" in text
