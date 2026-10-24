@@ -181,3 +181,10 @@ def test_the_guide_describes_release_prs_as_waiting_for_approval(render):
     guide = (rendered(render) / "REPOSITORY_SETUP.md").read_text()
     assert "approval-required" in guide
     assert "merge it as a repository admin" not in guide.lower()
+
+
+def test_the_guide_says_the_pull_request_target_checks_never_run_on_release_prs(render):
+    guide = (rendered(render) / "REPOSITORY_SETUP.md").read_text()
+    assert "approval-required state" in guide
+    assert "`pull_request_target` checks" in guide
+    assert "give\n  repository admins a bypass" in guide
