@@ -88,15 +88,35 @@ def test_a_missing_answers_template_fails_even_when_a_backup_remains(render):
     assert run_check(dest).returncode != 0
 
 
-def test_an_ordinary_repo_requires_the_exact_answers_template_path(render):
-    dest = rendered(render)
-    assert ".jinja.jinja" not in (dest / "REPOSITORY_SETUP.md").read_text()
+def move_answers_template_one_level_down(dest):
     exact = dest / "template" / ".copier-answers.yml.jinja"
     nested = dest / "template" / "template" / ".copier-answers.yml.jinja.jinja"
     nested.parent.mkdir(parents=True)
     nested.write_text(exact.read_text())
     exact.unlink()
+
+
+@pytest.mark.parametrize("subject", ["demo", "copier"])
+def test_an_ordinary_repo_requires_the_exact_answers_template_path(render, subject):
+    """Even a repo named copier-copier: only a payload that is itself a template may nest it."""
+    result, dest = render(subject=subject)
+    assert result.returncode == 0, result.stderr
+    move_answers_template_one_level_down(dest)
     assert run_check(dest).returncode != 0
+
+
+def test_a_payload_that_is_itself_a_template_may_hold_the_answers_template_one_level_down(render):
+    dest = rendered(render)
+    move_answers_template_one_level_down(dest)
+    (dest / "template" / "copier.yml").write_text("_subdirectory: template\n")
+    check = run_check(dest)
+    assert check.returncode == 0, check.stdout + check.stderr
+
+
+def test_the_guide_makes_squash_merges_take_the_pr_title(render):
+    guide = (rendered(render) / "REPOSITORY_SETUP.md").read_text()
+    assert guide.count("squash_merge_commit_title") == 2  # set, then verified
+    assert "squash_merge_commit_title=PR_TITLE" in guide
 
 
 def test_the_generated_readme_credits_copier_copier_under_its_own_heading(render):

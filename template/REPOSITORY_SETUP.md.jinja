@@ -23,21 +23,22 @@ hand-made or deleted tag breaks their updates.
 
 ## Squash-only merges
 
-The PR title becomes the commit and the changelog line, so merge by squash only.
+The PR title becomes the commit and the changelog line, so merge by squash only and make the squash commit take the
+PR title: with the default, a one-commit PR lands its commit title instead, which may not be a Conventional Commit.
 
 **[AGENT]**
 
 ```sh
 gh api -X PATCH repos/{{ owner }}/{{ repo_name }} \
   -F allow_squash_merge=true -F allow_merge_commit=false -F allow_rebase_merge=false \
-  -F delete_branch_on_merge=true
+  -F delete_branch_on_merge=true -f squash_merge_commit_title=PR_TITLE
 ```
 
 **[CHECK]**
 
 ```sh
 gh api repos/{{ owner }}/{{ repo_name }} \
-  --jq '.allow_squash_merge and (.allow_merge_commit | not) and (.allow_rebase_merge | not)' | grep -qx true
+  --jq '.allow_squash_merge and (.allow_merge_commit | not) and (.allow_rebase_merge | not) and .squash_merge_commit_title == "PR_TITLE"' | grep -qx true
 ```
 
 ## Let Actions open the release PR
@@ -109,10 +110,12 @@ Run from the repository root.
   fi
   # 3. No tasks, quoted or not.
   if grep -Eq "^[[:space:]]*['\"]?_tasks['\"]?[[:space:]]*:" copier.yml; then fail "copier.yml: has _tasks"; fi
-  # 4. The answers-file template is in the payload, under exactly this name.
-{% if repo_name == "copier-copier" %}  #    (copier-copier generates template repos, so its own payload holds it one level down, with a doubled suffix.)
-{% endif %}  [ -f template/.copier-answers.yml.jinja ]{% if repo_name == "copier-copier" %} || [ -f template/template/.copier-answers.yml.jinja.jinja ]{% endif %} \
-    || fail "template/.copier-answers.yml.jinja is missing"
+  # 4. The answers-file template is in the payload, under exactly this name. A payload that is itself
+  #    a template repo (it has its own template/copier.yml, as in copier-copier) holds it one level down,
+  #    with a doubled suffix.
+  if [ -f template/copier.yml ]; then answers=template/template/.copier-answers.yml.jinja.jinja
+  else answers=template/.copier-answers.yml.jinja; fi
+  [ -f "$answers" ] || fail "$answers is missing"
 )
 ```
 
