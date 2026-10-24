@@ -260,3 +260,17 @@ def test_a_custom_start_delimiter_without_the_matching_end_delimiter_fails_the_c
     check = run_check(dest)
     assert check.returncode != 0
     assert "is missing" in check.stdout + check.stderr
+
+
+def test_delimiters_that_only_start_with_the_expected_strings_fail_the_check(render):
+    dest = rendered(render)
+    copier_yml = dest / "copier.yml"
+    copier_yml.write_text(
+        copier_yml.read_text() + '_envops:\n  variable_start_string: "[[["\n  variable_end_string: "]]]"\n'
+    )
+    (dest / "template" / ".copier-answers.yml.jinja").rename(
+        dest / "template" / "[[ _copier_conf.answers_file ]].jinja"
+    )
+    check = run_check(dest)
+    assert check.returncode != 0
+    assert "is missing" in check.stdout + check.stderr
