@@ -72,4 +72,4 @@ def test_seeded_template_config_documents_the_seed_once_contract(render):
     ):
         assert line in text.splitlines(), line
     assert "`copier copy --overwrite`" in text
-    assert "deleting its `.gitignore` and `cobo.lock` first" in text
+    assert "restore the project's own rules below the end fence" in text
