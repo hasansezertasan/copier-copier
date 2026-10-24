@@ -1,0 +1,9 @@
+# Kept apart from .config/mise.toml, which the template owns and the self-hosting test compares
+# with a fresh render. Renovate's mise manager reads this file too.
+[tools]
+# keep-the-why-dashboard exports the Keep the Why dashboard published to GitHub Pages.
+"pipx:keep-the-why-dashboard" = "0.11.15"
+
+[tasks.dashboard-export]
+description = "Export the Keep the Why dashboard into site/dashboard/live"
+run = "mise exec -- ktw-dashboard --export site/dashboard/live ."

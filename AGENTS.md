@@ -25,3 +25,15 @@ Default five-label vocabulary (`needs-triage`, `needs-info`, `ready-for-agent`, 
 ### Domain docs
 
 Single-context: one `GLOSSARY.md` and `docs/adr/` at the repo root. See `docs/agents/domain.md`.
+
+## Keep the Why
+
+This project records the reasoning behind its code with the Keep the Why
+skill (https://keepthewhy.com) — the `.keep-the-why` file at the project
+root is its config. Before doing anything else in a session, whatever the
+first request is about, load the skill: in Claude Code, invoke the
+`keep-the-why` skill (Skill tool); in any other agent, install the skill
+first (https://keepthewhy.com/installation/), then read its `SKILL.md` and
+follow it, including the `references/*.md` files it points to for the
+situation at hand. In Claude Code, if the skill is not available on a fresh
+clone, install it with `claude plugin install keep-the-why@keep-the-why --scope project`.
