@@ -21,6 +21,15 @@ _skip_if_exists:
   - .python-version
   - .github/release-please-manifest.json
 
+# Payload seeds a template repo replaces or deletes (an adopted repo has its own payload, so
+# `template/PLACEHOLDER.md` and the default answers-file template do not apply). `_skip_if_exists`
+# would recreate a deleted file on every update; excluding them on update stops that, while a
+# fresh copy still seeds them. `_skip_if_exists` patterns cannot be limited to updates, `_exclude`
+# can. See docs/adr/0005-do-not-reseed-deleted-payload-seeds-on-update.md.
+_exclude:
+  - "{% if _copier_operation == 'update' %}template/PLACEHOLDER.md{% endif %}"
+  - "{% if _copier_operation == 'update' %}template/.copier-answers.yml.jinja{% endif %}"
+
 # A message, not a task: `_tasks` would force --trust and stop Renovate's copier
 # manager from opening update PRs.
 _message_after_copy: |
