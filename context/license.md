@@ -25,5 +25,5 @@ file, but the seal is gone, so cobo no longer manages it and the extra step
 buys nothing.
 
 **Rejected alternative:** use cobo only as a one-time source for the license
-text. Possible, but the text changes rarely and is already vendored, and it
+text. Possible, but the text rarely changes and is already vendored, and it
 adds a manual regeneration step with no drift check.
