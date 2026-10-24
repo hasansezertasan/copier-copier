@@ -4,6 +4,7 @@ import shutil
 import tomllib
 
 import pytest
+import yaml
 
 from conftest import run
 
@@ -62,4 +63,13 @@ def test_seeded_template_config_documents_the_seed_once_contract(render):
     result, dest = render()
     assert result.returncode == 0, result.stderr
     text = (dest / "copier.yml").read_text()
-    assert "_skip_if_exists" in text and "cobo.lock" in text
+    # The guidance stays a comment: the placeholder payload ships no cobo files.
+    assert "_skip_if_exists" not in yaml.safe_load(text)
+    for line in (
+        "# _skip_if_exists:",
+        "#   - .gitignore",
+        "#   - cobo.lock",
+    ):
+        assert line in text.splitlines(), line
+    assert "`copier copy --overwrite`" in text
+    assert "deleting its `.gitignore` and `cobo.lock` first" in text
