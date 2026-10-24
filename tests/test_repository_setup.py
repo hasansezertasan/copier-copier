@@ -88,6 +88,17 @@ def test_a_missing_answers_template_fails_even_when_a_backup_remains(render):
     assert run_check(dest).returncode != 0
 
 
+def test_an_ordinary_repo_requires_the_exact_answers_template_path(render):
+    dest = rendered(render)
+    assert ".jinja.jinja" not in (dest / "REPOSITORY_SETUP.md").read_text()
+    exact = dest / "template" / ".copier-answers.yml.jinja"
+    nested = dest / "template" / "template" / ".copier-answers.yml.jinja.jinja"
+    nested.parent.mkdir(parents=True)
+    nested.write_text(exact.read_text())
+    exact.unlink()
+    assert run_check(dest).returncode != 0
+
+
 def test_the_generated_readme_credits_copier_copier_under_its_own_heading(render):
     dest = rendered(render)
     assert (dest / "README.md").read_text().rstrip().endswith(
