@@ -107,7 +107,7 @@ Run from the repository root.
   grep -qF 'copier copy https://github.com/hasansezertasan/copier-copier.git' README.md || fail "README.md: usage must say copier copy https://github.com/hasansezertasan/copier-copier.git"
   if grep -q 'gh:' README.md; then fail "README.md: uses the gh: shortcut"; fi
   [ -f .copier-answers.yml ] || fail ".copier-answers.yml is missing: copier update needs it to know which release generated this repo"
-  grep -Eq "^['\"]?_src_path['\"]?:[[:space:]]*['\"]?https://" .copier-answers.yml \
+  grep -Eq "^['\"]?_src_path['\"]?:[[:space:]]*['\"]?https://[^/[:space:]]+/[^[:space:]]+" .copier-answers.yml \
     || fail ".copier-answers.yml: _src_path must be a full https git URL, not gh: or a local path"
   # 3. No tasks, quoted or not.
   if grep -Eq "^[[:space:]]*['\"]?_tasks['\"]?[[:space:]]*:" copier.yml; then fail "copier.yml: has _tasks"; fi
@@ -121,7 +121,7 @@ Run from the repository root.
 ```
 
 These are text checks, on purpose. They do not parse YAML, so an exotic spelling of a key can slip through, and
-they only require a full `https://` `_src_path`; they cannot tell whether it names the right repository. A
+they only require an `https://` `_src_path` with a host and a path; they cannot tell whether it names the right repository. A
 stricter check would need a YAML parser in this block, which the guide deliberately does not assume.
 
 Conventions 5 and 6 have no scriptable check. `mise run test` renders the template and walks a
@@ -131,6 +131,6 @@ from `_skip_if_exists`: the update test tags an empty commit, so both versions r
 
 ## Known limitations
 
-- A pull request opened with `GITHUB_TOKEN` (the release PR) does not trigger other workflows, so required
-  status checks stay pending on it. Merge it as a repository admin, or do not require checks for
-  `release-please--*` branches.
+- When release-please opens a release PR or updates its branch with `GITHUB_TOKEN`, the `pull_request` workflows
+  start in an approval-required state (`action_required`). A user with write access approves them, then waits for
+  the required status checks before merging.

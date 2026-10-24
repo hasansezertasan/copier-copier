@@ -88,8 +88,10 @@ def test_the_gh_shortcut_in_the_readme_fails_the_check(render):
         '_src_path: "gh:hasansezertasan/copier-copier"',
         "'_src_path': 'gh:hasansezertasan/copier-copier'",
         "_src_path: /tmp/copier-copier",
+        "_src_path: https://",
+        "_src_path: https://github.com",
     ],
-    ids=["gh", "gh-single-quoted", "gh-double-quoted", "gh-quoted-key", "local-path"],
+    ids=["gh", "gh-single-quoted", "gh-double-quoted", "gh-quoted-key", "local-path", "bare-scheme", "host-only"],
 )
 def test_an_answers_file_that_is_not_a_full_https_url_fails_the_check(render, line):
     dest = rendered(render)
@@ -142,6 +144,7 @@ def test_an_ordinary_repo_requires_the_exact_answers_template_path(render, subje
     """Even a repo named copier-copier: only a payload that is itself a template may nest it."""
     result, dest = render(subject=subject)
     assert result.returncode == 0, result.stderr
+    point_answers_at_the_published_template(dest)  # so only the nested path can fail the check
     move_answers_template_one_level_down(dest)
     assert run_check(dest).returncode != 0
 
@@ -172,3 +175,9 @@ def test_this_repos_own_guide_passes_its_own_convention_checks():
     script = conventions_check((REPO / "REPOSITORY_SETUP.md").read_text())
     check = subprocess.run(["bash", "-c", script], cwd=REPO, capture_output=True, text=True, check=False)
     assert check.returncode == 0, check.stdout + check.stderr
+
+
+def test_the_guide_describes_release_prs_as_waiting_for_approval(render):
+    guide = (rendered(render) / "REPOSITORY_SETUP.md").read_text()
+    assert "approval-required" in guide
+    assert "merge it as a repository admin" not in guide.lower()
