@@ -70,8 +70,9 @@ gh api repos/hasansezertasan/copier-copier/actions/permissions/workflow \
 A template repo is only useful if projects can keep updating from it, so these hold for every one. Each has a
 check in the next section.
 
-1. **The payload's README links back.** Once `template/` has a README, it ends with
-   `Generated from [copier-copier](https://github.com/hasansezertasan/copier-copier).`, so a generated project says where it came from.
+1. **The payload's README links back.** Once `template/` has a README, it ends with a `## Credits`
+   section holding `Generated from [copier-copier](https://github.com/hasansezertasan/copier-copier).`, so a generated project says where
+   it came from. The heading keeps the line from reading as part of the section above it.
 2. **`_src_path` is a full git URL.** Usage commands say `copier copy https://github.com/hasansezertasan/copier-copier.git ...`, never the
    `gh:` shortcut: Renovate's copier manager looks `_src_path` up as a git remote and fails on the shortcut,
    so no update PR is opened.
@@ -93,10 +94,11 @@ Run from the repository root.
 ```sh
 (
   set -e
-  # 1. The payload README, if there is one, ends with the back reference.
+  # 1. The payload README, if there is one, ends with the Credits section and the back reference.
   for readme in template/README.md template/README.md.jinja; do
     [ -f "$readme" ] || continue
-    tail -n 3 "$readme" | grep -qF 'Generated from [copier-copier](https://github.com/hasansezertasan/copier-copier).'
+    [ "$(tail -n 3 "$readme" | head -n 1)" = '## Credits' ]
+    tail -n 1 "$readme" | grep -qF 'Generated from [copier-copier](https://github.com/hasansezertasan/copier-copier).'
   done
   # 2. Usage commands use the full git URL.
   grep -qF 'copier copy https://github.com/hasansezertasan/copier-copier.git' README.md
