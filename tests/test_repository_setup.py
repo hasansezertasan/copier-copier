@@ -31,6 +31,10 @@ def point_answers_at_the_published_template(dest):
     )
 
 
+def configure_square_bracket_delimiters(copier_yml):
+    copier_yml.write_text(copier_yml.read_text() + '_envops:\n  variable_start_string: "[["\n')
+
+
 def rendered(render):
     result, dest = render()
     assert result.returncode == 0, result.stderr
@@ -194,6 +198,7 @@ def test_the_guide_qualifies_when_the_pull_request_target_checks_do_not_run_on_r
 
 def test_a_payload_with_custom_delimiters_passes_with_its_answers_file_template(render):
     dest = rendered(render)
+    configure_square_bracket_delimiters(dest / "copier.yml")
     (dest / "template" / ".copier-answers.yml.jinja").rename(
         dest / "template" / "[[ _copier_conf.answers_file ]].jinja"
     )
@@ -214,7 +219,9 @@ def test_a_nested_payload_with_custom_delimiters_passes_with_its_nested_answers_
     nested = dest / "template" / "template"
     nested.mkdir(parents=True)
     (nested / "[[ _copier_conf.answers_file ]].jinja.jinja").write_text("answers\n")
-    (dest / "template" / "copier.yml").write_text("_subdirectory: template\n")
+    (dest / "template" / "copier.yml").write_text(
+        '_subdirectory: template\n_envops:\n  variable_start_string: "[["\n'
+    )
     (dest / "template" / ".copier-answers.yml.jinja").unlink()
     check = run_check(dest)
     assert check.returncode == 0, check.stdout + check.stderr
@@ -223,6 +230,16 @@ def test_a_nested_payload_with_custom_delimiters_passes_with_its_nested_answers_
 def test_a_nested_payload_with_the_top_level_custom_file_only_fails_the_check(render):
     dest = rendered(render)
     (dest / "template" / "copier.yml").write_text("_subdirectory: template\n")
+    (dest / "template" / ".copier-answers.yml.jinja").rename(
+        dest / "template" / "[[ _copier_conf.answers_file ]].jinja"
+    )
+    check = run_check(dest)
+    assert check.returncode != 0
+    assert "is missing" in check.stdout + check.stderr
+
+
+def test_the_custom_delimiter_file_with_default_delimiters_fails_the_check(render):
+    dest = rendered(render)
     (dest / "template" / ".copier-answers.yml.jinja").rename(
         dest / "template" / "[[ _copier_conf.answers_file ]].jinja"
     )

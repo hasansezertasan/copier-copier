@@ -118,12 +118,17 @@ Run from the repository root.
   if [ -f template/copier.yml ]; then
     answers=template/template/.copier-answers.yml.jinja.jinja
     delimited='template/template/[[ _copier_conf.answers_file ]].jinja.jinja'
+    config=template/copier.yml
   else
     answers=template/.copier-answers.yml.jinja
     delimited='template/[[ _copier_conf.answers_file ]].jinja'
+    config=copier.yml
   fi
-  #    A payload with its own Jinja delimiters (convention 6) spells the same file with them.
-  [ -f "$answers" ] || [ -f "$delimited" ] || fail "$answers is missing"
+  #    A payload with its own Jinja delimiters (convention 6) spells the same file with them, but only
+  #    when that copier.yml really configures `[[` as the variable start.
+  if grep -Eq "^[[:space:]]*['\"]?variable_start_string['\"]?[[:space:]]*:[[:space:]]*['\"]?\[\[" "$config" \
+    && [ -f "$delimited" ]; then answers=$delimited; fi
+  [ -f "$answers" ] || fail "$answers is missing"
 )
 ```
 
