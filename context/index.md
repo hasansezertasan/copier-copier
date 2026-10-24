@@ -58,6 +58,8 @@
 
 ## R
 
+- [repository-setup-guide.md](repository-setup-guide.md) — Why the template conventions are checked by a script in the generated setup guide, and the two that have no check.
+
 ## S
 
 - [self-hosting.md](self-hosting.md) — self-hosting with `_skip_if_exists` for author-owned files
