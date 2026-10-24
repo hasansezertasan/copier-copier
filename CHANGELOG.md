@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.2](https://github.com/hasansezertasan/copier-copier/compare/v0.3.1...v0.3.2) (2026-10-24)
+
+
+### 🐛 Bug Fixes
+
+* do not recreate deleted payload seeds on update ([#31](https://github.com/hasansezertasan/copier-copier/issues/31)) ([7aed65b](https://github.com/hasansezertasan/copier-copier/commit/7aed65bd9074fd6bb787c2b297fb799d9e0817ca))
+
 ## [0.3.1](https://github.com/hasansezertasan/copier-copier/compare/v0.3.0...v0.3.1) (2026-10-24)
 
 
