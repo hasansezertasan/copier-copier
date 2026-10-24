@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.1](https://github.com/hasansezertasan/copier-copier/compare/v0.3.0...v0.3.1) (2026-10-24)
+
+
+### 🐛 Bug Fixes
+
+* check the answers-file template under custom delimiters ([#29](https://github.com/hasansezertasan/copier-copier/issues/29)) ([ded7068](https://github.com/hasansezertasan/copier-copier/commit/ded7068cd201cba49a81f6243f740698a7fab18d))
+
 ## [0.3.0](https://github.com/hasansezertasan/copier-copier/compare/v0.2.1...v0.3.0) (2026-10-24)
 
 
