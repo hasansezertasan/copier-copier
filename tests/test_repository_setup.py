@@ -19,9 +19,22 @@ def run_check(dest):
     return subprocess.run(["bash", "-c", script], cwd=dest, capture_output=True, text=True, check=False)
 
 
+def point_answers_at_the_published_template(dest):
+    """Rendering from a local path records that path; an author re-points it at the published URL."""
+    answers = dest / ".copier-answers.yml"
+    answers.write_text(
+        re.sub(
+            r"(?m)^_src_path:.*$",
+            "_src_path: https://github.com/hasansezertasan/copier-copier.git",
+            answers.read_text(),
+        )
+    )
+
+
 def rendered(render):
     result, dest = render()
     assert result.returncode == 0, result.stderr
+    point_answers_at_the_published_template(dest)
     return dest
 
 
@@ -68,12 +81,31 @@ def test_the_gh_shortcut_in_the_readme_fails_the_check(render):
 
 
 @pytest.mark.parametrize(
-    "value", ["gh:hasansezertasan/copier-copier", "'gh:hasansezertasan/copier-copier'", '"gh:hasansezertasan/copier-copier"']
+    "line",
+    [
+        "_src_path: gh:hasansezertasan/copier-copier",
+        "_src_path: 'gh:hasansezertasan/copier-copier'",
+        '_src_path: "gh:hasansezertasan/copier-copier"',
+        "'_src_path': 'gh:hasansezertasan/copier-copier'",
+        "_src_path: /tmp/copier-copier",
+    ],
+    ids=["gh", "gh-single-quoted", "gh-double-quoted", "gh-quoted-key", "local-path"],
 )
-def test_the_gh_shortcut_in_the_answers_file_fails_the_check_however_it_is_quoted(render, value):
+def test_an_answers_file_that_is_not_a_full_https_url_fails_the_check(render, line):
     dest = rendered(render)
-    (dest / ".copier-answers.yml").write_text(f"_src_path: {value}\n_commit: v0.1.0\n")
+    (dest / ".copier-answers.yml").write_text(f"{line}\n_commit: v0.1.0\n")
     assert run_check(dest).returncode != 0
+
+
+@pytest.mark.parametrize(
+    "line",
+    ["_src_path: https://github.com/hasansezertasan/copier-copier.git", "'_src_path': 'https://github.com/example/copier-copier.git'"],
+)
+def test_an_answers_file_with_a_full_https_url_passes_the_check(render, line):
+    dest = rendered(render)
+    (dest / ".copier-answers.yml").write_text(f"{line}\n_commit: v0.1.0\n")
+    check = run_check(dest)
+    assert check.returncode == 0, check.stdout + check.stderr
 
 
 @pytest.mark.parametrize("key", ["_tasks", "'_tasks'", '"_tasks"'])

@@ -76,7 +76,8 @@ check in the next section.
    it came from. The heading keeps the line from reading as part of the section above it.
 2. **`_src_path` is a full git URL.** Usage commands say `copier copy {{ repo_url }}.git ...`, never the
    `gh:` shortcut: Renovate's copier manager looks `_src_path` up as a git remote and fails on the shortcut,
-   so no update PR is opened.
+   so no update PR is opened. The same goes for the `_src_path` recorded in this repo's own `.copier-answers.yml`
+   (the template it was generated from): if you generated from a local clone, edit it to the published URL.
 3. **No `_tasks` in `copier.yml`.** A task makes the template unsafe and forces `--trust`, which Renovate's
    copier manager does not pass. Print next steps with `_message_after_copy` instead.
 4. **The payload ships its answers file.** `template/.copier-answers.yml.jinja` is what lets generated
@@ -102,11 +103,12 @@ Run from the repository root.
     [ "$(tail -n 3 "$readme" | head -n 1)" = '## Credits' ] || fail "$readme: no ## Credits heading before the last line"
     tail -n 1 "$readme" | grep -qF 'Generated from [{{ repo_name }}]({{ repo_url }}).' || fail "$readme: last line is not the back reference"
   done
-  # 2. Usage commands and the recorded _src_path use the full git URL, never the gh: shortcut.
+  # 2. Usage commands and the recorded _src_path (where this repo was generated from) use a full git URL.
   grep -qF 'copier copy {{ repo_url }}.git' README.md || fail "README.md: usage must say copier copy {{ repo_url }}.git"
   if grep -q 'gh:' README.md; then fail "README.md: uses the gh: shortcut"; fi
-  if [ -f .copier-answers.yml ] && grep -Eq "^_src_path:[[:space:]]*['\"]?gh:" .copier-answers.yml; then
-    fail ".copier-answers.yml: _src_path uses the gh: shortcut"
+  if [ -f .copier-answers.yml ]; then
+    grep -Eq "^['\"]?_src_path['\"]?:[[:space:]]*['\"]?https://" .copier-answers.yml \
+      || fail ".copier-answers.yml: _src_path must be a full https git URL, not gh: or a local path"
   fi
   # 3. No tasks, quoted or not.
   if grep -Eq "^[[:space:]]*['\"]?_tasks['\"]?[[:space:]]*:" copier.yml; then fail "copier.yml: has _tasks"; fi
