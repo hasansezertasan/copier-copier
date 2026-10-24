@@ -29,7 +29,7 @@ jobs:
           # The dashboard dates entries by their Git history.
           fetch-depth: 0
           persist-credentials: false
-      # Runs the dashboard and Python pinned in .config/mise.toml and .python-version, so Renovate's pins are
+      # Runs the dashboard and Python pinned in .config/mise/conf.d/keep-the-why.toml, .config/mise.toml and .python-version, so Renovate's pins are
       # the versions deployed here.
       - name: Install mise
         uses: jdx/mise-action@9b200bcecbfd6303e69a4a261b2e09e3757440a7  # v5.2.0
@@ -39,6 +39,7 @@ jobs:
       - name: Export dashboard
         run: |
           mise trust .config/mise.toml
+          mise trust .config/mise/conf.d/keep-the-why.toml
           mise install
           mise run dashboard-export
       # The Pages root has no page of its own; send it to the dashboard so the deployment URL does not 404.
