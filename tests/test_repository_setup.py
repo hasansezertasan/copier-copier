@@ -207,3 +207,25 @@ def test_a_payload_without_any_answers_file_template_fails_the_check(render):
     check = run_check(dest)
     assert check.returncode != 0
     assert "is missing" in check.stdout + check.stderr
+
+
+def test_a_nested_payload_with_custom_delimiters_passes_with_its_nested_answers_file_template(render):
+    dest = rendered(render)
+    nested = dest / "template" / "template"
+    nested.mkdir(parents=True)
+    (nested / "[[ _copier_conf.answers_file ]].jinja.jinja").write_text("answers\n")
+    (dest / "template" / "copier.yml").write_text("_subdirectory: template\n")
+    (dest / "template" / ".copier-answers.yml.jinja").unlink()
+    check = run_check(dest)
+    assert check.returncode == 0, check.stdout + check.stderr
+
+
+def test_a_nested_payload_with_the_top_level_custom_file_only_fails_the_check(render):
+    dest = rendered(render)
+    (dest / "template" / "copier.yml").write_text("_subdirectory: template\n")
+    (dest / "template" / ".copier-answers.yml.jinja").rename(
+        dest / "template" / "[[ _copier_conf.answers_file ]].jinja"
+    )
+    check = run_check(dest)
+    assert check.returncode != 0
+    assert "is missing" in check.stdout + check.stderr

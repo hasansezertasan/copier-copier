@@ -115,13 +115,15 @@ Run from the repository root.
   # 4. The answers-file template is in the payload, under exactly this name. A payload that is itself
   #    a template repo (it has its own template/copier.yml, as in copier-copier) holds it one level down,
   #    with a doubled suffix.
-  if [ -f template/copier.yml ]; then answers=template/template/.copier-answers.yml.jinja.jinja
-  else answers=template/.copier-answers.yml.jinja; fi
-  #    A payload with its own Jinja delimiters (convention 6) spells the same file with them.
-  if [ ! -f "$answers" ] && [ -f 'template/[[ _copier_conf.answers_file ]].jinja' ]; then
-    answers='template/[[ _copier_conf.answers_file ]].jinja'
+  if [ -f template/copier.yml ]; then
+    answers=template/template/.copier-answers.yml.jinja.jinja
+    delimited='template/template/[[ _copier_conf.answers_file ]].jinja.jinja'
+  else
+    answers=template/.copier-answers.yml.jinja
+    delimited='template/[[ _copier_conf.answers_file ]].jinja'
   fi
-  [ -f "$answers" ] || fail "$answers is missing"
+  #    A payload with its own Jinja delimiters (convention 6) spells the same file with them.
+  [ -f "$answers" ] || [ -f "$delimited" ] || fail "$answers is missing"
 )
 ```
 
