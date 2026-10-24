@@ -19,6 +19,5 @@ _answers_file: .copier-answers.yml
 #   - .gitignore
 #   - cobo.lock
 # `_skip_if_exists` also applies to `copier copy --overwrite`. To adopt an existing project, copy
-# its `.gitignore` and `cobo.lock` aside and delete them so the template's matched pair is
-# installed, then restore the project's own rules below the end fence and re-dump the cobo
+# every file listed above aside and delete them so the template's matched set is installed, then restore the project's own rules below the end fence and re-dump the cobo
 # sources it used (`cobo gitignore dump <names> --lock`); keep its pair as is when that is intended.
