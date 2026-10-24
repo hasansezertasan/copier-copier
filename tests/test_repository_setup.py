@@ -1,11 +1,26 @@
 import re
 import subprocess
 
+import pytest
+
+BACK_REFERENCE = "## Credits\n\nGenerated from [copier-demo](https://github.com/example/copier-demo).\n"
+
 
 def conventions_check(guide: str) -> str:
     """The shell block under "Checking the conventions"."""
     section = guide.split("## Checking the conventions", 1)[1]
     return re.search(r"```sh\n(.*?)```", section, re.S).group(1)
+
+
+def run_check(dest):
+    script = conventions_check((dest / "REPOSITORY_SETUP.md").read_text())
+    return subprocess.run(["bash", "-c", script], cwd=dest, capture_output=True, text=True, check=False)
+
+
+def rendered(render):
+    result, dest = render()
+    assert result.returncode == 0, result.stderr
+    return dest
 
 
 def test_guide_names_the_generated_repo(render):
@@ -18,47 +33,61 @@ def test_guide_names_the_generated_repo(render):
 
 
 def test_a_fresh_repo_passes_the_guides_convention_checks(render):
-    result, dest = render()
-    assert result.returncode == 0, result.stderr
-    script = conventions_check((dest / "REPOSITORY_SETUP.md").read_text())
-    check = subprocess.run(["bash", "-c", script], cwd=dest, capture_output=True, text=True, check=False)
+    check = run_check(rendered(render))
     assert check.returncode == 0, check.stdout + check.stderr
-
-
-def test_the_convention_checks_catch_a_missing_back_reference(render):
-    result, dest = render()
-    assert result.returncode == 0, result.stderr
-    (dest / "template" / "README.md").write_text("# Payload\n")
-    script = conventions_check((dest / "REPOSITORY_SETUP.md").read_text())
-    check = subprocess.run(["bash", "-c", script], cwd=dest, capture_output=True, text=True, check=False)
-    assert check.returncode != 0
-
-
-def test_a_payload_readme_without_a_credits_heading_fails_the_check(render):
-    result, dest = render()
-    assert result.returncode == 0, result.stderr
-    (dest / "template" / "README.md").write_text(
-        "# Payload\n\nGenerated from [copier-demo](https://github.com/example/copier-demo).\n"
-    )
-    script = conventions_check((dest / "REPOSITORY_SETUP.md").read_text())
-    check = subprocess.run(["bash", "-c", script], cwd=dest, capture_output=True, text=True, check=False)
-    assert check.returncode != 0
 
 
 def test_a_payload_readme_with_credits_and_the_back_reference_passes_the_check(render):
-    result, dest = render()
-    assert result.returncode == 0, result.stderr
-    (dest / "template" / "README.md").write_text(
-        "# Payload\n\n## Credits\n\nGenerated from [copier-demo](https://github.com/example/copier-demo).\n"
-    )
-    script = conventions_check((dest / "REPOSITORY_SETUP.md").read_text())
-    check = subprocess.run(["bash", "-c", script], cwd=dest, capture_output=True, text=True, check=False)
+    dest = rendered(render)
+    (dest / "template" / "README.md").write_text("# Payload\n\n" + BACK_REFERENCE)
+    check = run_check(dest)
     assert check.returncode == 0, check.stdout + check.stderr
 
 
+@pytest.mark.parametrize(
+    "readme",
+    [
+        "# Payload\n",
+        "# Payload\n\nGenerated from [copier-demo](https://github.com/example/copier-demo).\n",
+    ],
+    ids=["no-back-reference", "no-credits-heading"],
+)
+def test_a_payload_readme_that_does_not_credit_the_template_fails_the_check(render, readme):
+    dest = rendered(render)
+    (dest / "template" / "README.md").write_text(readme)
+    assert run_check(dest).returncode != 0
+
+
+def test_the_gh_shortcut_in_the_readme_fails_the_check(render):
+    dest = rendered(render)
+    readme = dest / "README.md"
+    readme.write_text(readme.read_text() + "\ncopier copy gh:example/copier-demo .\n")
+    assert run_check(dest).returncode != 0
+
+
+def test_the_gh_shortcut_in_the_answers_file_fails_the_check(render):
+    dest = rendered(render)
+    (dest / ".copier-answers.yml").write_text("_src_path: gh:hasansezertasan/copier-copier\n_commit: v0.1.0\n")
+    assert run_check(dest).returncode != 0
+
+
+@pytest.mark.parametrize("key", ["_tasks", "'_tasks'", '"_tasks"'])
+def test_tasks_fail_the_check_however_the_key_is_quoted(render, key):
+    dest = rendered(render)
+    copier_yml = dest / "copier.yml"
+    copier_yml.write_text(copier_yml.read_text() + f"\n{key}:\n  - echo hi\n")
+    assert run_check(dest).returncode != 0
+
+
+def test_a_missing_answers_template_fails_even_when_a_backup_remains(render):
+    dest = rendered(render)
+    answers = dest / "template" / ".copier-answers.yml.jinja"
+    answers.rename(answers.with_name(answers.name + ".bak"))
+    assert run_check(dest).returncode != 0
+
+
 def test_the_generated_readme_credits_copier_copier_under_its_own_heading(render):
-    result, dest = render()
-    assert result.returncode == 0, result.stderr
+    dest = rendered(render)
     assert (dest / "README.md").read_text().rstrip().endswith(
         "## Credits\n\nGenerated from [copier-copier](https://github.com/hasansezertasan/copier-copier)."
     )

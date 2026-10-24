@@ -94,24 +94,30 @@ Run from the repository root.
 ```sh
 (
   set -e
+  fail() { echo "$1"; exit 1; }
   # 1. The payload README, if there is one, ends with the Credits section and the back reference.
   for readme in template/README.md template/README.md.jinja; do
     [ -f "$readme" ] || continue
-    [ "$(tail -n 3 "$readme" | head -n 1)" = '## Credits' ]
-    tail -n 1 "$readme" | grep -qF 'Generated from [copier-copier](https://github.com/hasansezertasan/copier-copier).'
+    [ "$(tail -n 3 "$readme" | head -n 1)" = '## Credits' ] || fail "$readme: no ## Credits heading before the last line"
+    tail -n 1 "$readme" | grep -qF 'Generated from [copier-copier](https://github.com/hasansezertasan/copier-copier).' || fail "$readme: last line is not the back reference"
   done
-  # 2. Usage commands use the full git URL.
-  grep -qF 'copier copy https://github.com/hasansezertasan/copier-copier.git' README.md
-  ! grep -q 'gh:' README.md
-  # 3. No tasks.
-  ! grep -q '^_tasks' copier.yml
-  # 4. The answers-file template is in the payload.
-  ls template/.copier-answers.yml.jinja* >/dev/null
+  # 2. Usage commands and the recorded _src_path use the full git URL, never the gh: shortcut.
+  grep -qF 'copier copy https://github.com/hasansezertasan/copier-copier.git' README.md || fail "README.md: usage must say copier copy https://github.com/hasansezertasan/copier-copier.git"
+  if grep -q 'gh:' README.md; then fail "README.md: uses the gh: shortcut"; fi
+  if [ -f .copier-answers.yml ] && grep -Eq '^_src_path:[[:space:]]*gh:' .copier-answers.yml; then
+    fail ".copier-answers.yml: _src_path uses the gh: shortcut"
+  fi
+  # 3. No tasks, quoted or not.
+  if grep -Eq "^[[:space:]]*['\"]?_tasks['\"]?[[:space:]]*:" copier.yml; then fail "copier.yml: has _tasks"; fi
+  # 4. The answers-file template is in the payload, under exactly this name.
+  [ -f template/.copier-answers.yml.jinja ] || fail "template/.copier-answers.yml.jinja is missing"
 )
 ```
 
-Conventions 5 and 6 have no scriptable check: `mise run test` renders the template and walks a
-`copier update`, which fails when either is wrong.
+Conventions 5 and 6 have no scriptable check. `mise run test` renders the template and walks a
+`copier update`, which catches a payload that does not render, but not a project-owned file that is missing
+from `_skip_if_exists`: the update test tags an empty commit, so both versions render the same bytes. Review
+`_skip_if_exists` by hand whenever you add a payload file the project will edit.
 
 ## Known limitations
 
