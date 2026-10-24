@@ -31,6 +31,12 @@ def point_answers_at_the_published_template(dest):
     )
 
 
+def configure_square_bracket_delimiters(copier_yml):
+    copier_yml.write_text(
+        copier_yml.read_text() + '_envops:\n  variable_start_string: "[["\n  variable_end_string: "]]"\n'
+    )
+
+
 def rendered(render):
     result, dest = render()
     assert result.returncode == 0, result.stderr
@@ -190,3 +196,81 @@ def test_the_guide_qualifies_when_the_pull_request_target_checks_do_not_run_on_r
     assert "do not run when release-please\n  creates or updates the PR" in guide
     assert "Reopening it by hand starts both" in guide
     assert "never run on that PR" not in guide
+
+
+def test_a_payload_with_custom_delimiters_passes_with_its_answers_file_template(render):
+    dest = rendered(render)
+    configure_square_bracket_delimiters(dest / "copier.yml")
+    (dest / "template" / ".copier-answers.yml.jinja").rename(
+        dest / "template" / "[[ _copier_conf.answers_file ]].jinja"
+    )
+    check = run_check(dest)
+    assert check.returncode == 0, check.stdout + check.stderr
+
+
+def test_a_payload_without_any_answers_file_template_fails_the_check(render):
+    dest = rendered(render)
+    (dest / "template" / ".copier-answers.yml.jinja").unlink()
+    check = run_check(dest)
+    assert check.returncode != 0
+    assert "is missing" in check.stdout + check.stderr
+
+
+def test_a_nested_payload_with_custom_delimiters_passes_with_its_nested_answers_file_template(render):
+    dest = rendered(render)
+    nested = dest / "template" / "template"
+    nested.mkdir(parents=True)
+    (nested / "[[ _copier_conf.answers_file ]].jinja.jinja").write_text("answers\n")
+    (dest / "template" / "copier.yml").write_text(
+        '_subdirectory: template\n_envops:\n  variable_start_string: "[["\n  variable_end_string: "]]"\n'
+    )
+    (dest / "template" / ".copier-answers.yml.jinja").unlink()
+    check = run_check(dest)
+    assert check.returncode == 0, check.stdout + check.stderr
+
+
+def test_a_nested_payload_with_the_top_level_custom_file_only_fails_the_check(render):
+    dest = rendered(render)
+    (dest / "template" / "copier.yml").write_text("_subdirectory: template\n")
+    (dest / "template" / ".copier-answers.yml.jinja").rename(
+        dest / "template" / "[[ _copier_conf.answers_file ]].jinja"
+    )
+    check = run_check(dest)
+    assert check.returncode != 0
+    assert "is missing" in check.stdout + check.stderr
+
+
+def test_the_custom_delimiter_file_with_default_delimiters_fails_the_check(render):
+    dest = rendered(render)
+    (dest / "template" / ".copier-answers.yml.jinja").rename(
+        dest / "template" / "[[ _copier_conf.answers_file ]].jinja"
+    )
+    check = run_check(dest)
+    assert check.returncode != 0
+    assert "is missing" in check.stdout + check.stderr
+
+
+def test_a_custom_start_delimiter_without_the_matching_end_delimiter_fails_the_check(render):
+    dest = rendered(render)
+    copier_yml = dest / "copier.yml"
+    copier_yml.write_text(copier_yml.read_text() + '_envops:\n  variable_start_string: "[["\n')
+    (dest / "template" / ".copier-answers.yml.jinja").rename(
+        dest / "template" / "[[ _copier_conf.answers_file ]].jinja"
+    )
+    check = run_check(dest)
+    assert check.returncode != 0
+    assert "is missing" in check.stdout + check.stderr
+
+
+def test_delimiters_that_only_start_with_the_expected_strings_fail_the_check(render):
+    dest = rendered(render)
+    copier_yml = dest / "copier.yml"
+    copier_yml.write_text(
+        copier_yml.read_text() + '_envops:\n  variable_start_string: "[[["\n  variable_end_string: "]]]"\n'
+    )
+    (dest / "template" / ".copier-answers.yml.jinja").rename(
+        dest / "template" / "[[ _copier_conf.answers_file ]].jinja"
+    )
+    check = run_check(dest)
+    assert check.returncode != 0
+    assert "is missing" in check.stdout + check.stderr
